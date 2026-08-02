@@ -8,7 +8,6 @@ Ensure API Studio is:
 - Maintainable
 - Stable
 
-
 ---
 
 # Unit Testing
@@ -19,12 +18,10 @@ Test:
 - Parsers
 - State logic
 
-
 Tools:
 
 - Vitest
 - Cargo Test
-
 
 ---
 
@@ -36,7 +33,6 @@ Test:
 - Database
 - File system
 
-
 ---
 
 # End-to-End Testing
@@ -45,14 +41,12 @@ Tool:
 
 Playwright
 
-
 Test:
 
 - Creating requests
 - Sending requests
 - Saving collections
 - Import/export
-
 
 ---
 

@@ -53,7 +53,6 @@ Responsibilities:
 - Application state
 - User interactions
 
-
 Why React?
 
 React provides:
@@ -62,7 +61,6 @@ React provides:
 - Component-based architecture
 - Strong community support
 - Excellent developer tooling
-
 
 Why TypeScript?
 
@@ -86,7 +84,6 @@ Responsibilities:
 - Frontend/backend communication
 - Application packaging
 
-
 ## Why Tauri?
 
 Tauri was chosen over Electron because:
@@ -103,7 +100,6 @@ Tauri uses:
 - System WebView
 - Native backend
 
-
 Result:
 
 Smaller binaries and lower memory usage.
@@ -117,7 +113,6 @@ Tauri provides:
 - Explicit API permissions
 - Sandboxed execution
 - Controlled backend access
-
 
 ---
 
@@ -144,7 +139,6 @@ Responsibilities:
 - Security-sensitive operations
 - Background tasks
 
-
 ---
 
 # Why Rust?
@@ -156,7 +150,6 @@ Rust was selected because API Studio requires:
 - Reliability
 - Safe concurrency
 
-
 ---
 
 ## Performance
@@ -167,14 +160,12 @@ Rust provides:
 - Low memory usage
 - Efficient resource management
 
-
 This is useful for:
 
 - Large API responses
 - Streaming data
 - File uploads
 - Multiple concurrent requests
-
 
 ---
 
@@ -185,7 +176,6 @@ Rust prevents common problems:
 - Null pointer errors
 - Memory leaks
 - Data races
-
 
 without requiring garbage collection.
 
@@ -198,7 +188,6 @@ API clients require handling:
 - Multiple requests
 - Background processing
 - Response streaming
-
 
 Rust's async ecosystem supports this through:
 
@@ -221,7 +210,6 @@ Used for:
 - Background tasks
 - Timers
 
-
 ---
 
 ## Reqwest
@@ -237,7 +225,6 @@ Used for:
 - Authentication
 - File uploads
 
-
 ---
 
 ## Serde
@@ -251,7 +238,6 @@ Used for:
 - JSON parsing
 - Configuration files
 - API data
-
 
 ---
 
@@ -284,7 +270,6 @@ Stores:
 - History
 - Settings
 
-
 ---
 
 # Why SQLite?
@@ -296,7 +281,6 @@ SQLite was selected because:
 - Fast
 - Reliable
 - Offline friendly
-
 
 API Studio follows a local-first approach, making SQLite a natural fit.
 
@@ -316,7 +300,6 @@ Benefits:
 - Modern tooling
 - Optimized builds
 
-
 ---
 
 ## Tailwind CSS
@@ -330,7 +313,6 @@ Benefits:
 - Fast development
 - Consistent design system
 - Easy customization
-
 
 ---
 
@@ -347,7 +329,6 @@ Used for:
 - Forms
 - Menus
 
-
 ---
 
 ## Zustand
@@ -363,7 +344,6 @@ Used for:
 - Collections
 - Settings
 
-
 ---
 
 ## Monaco Editor
@@ -377,7 +357,6 @@ Used for:
 - JSON editor
 - Request body editor
 - Script editor
-
 
 Provides an experience similar to VS Code.
 
@@ -393,13 +372,11 @@ Provides an experience similar to VS Code.
 - Huge ecosystem
 - Same language frontend/backend
 
-
 ### Disadvantages
 
 - Higher memory usage
 - Larger application size
 - Less native performance
-
 
 Decision:
 
@@ -415,12 +392,10 @@ Rejected because API Studio aims for a lightweight desktop experience.
 - Simple concurrency
 - Fast development
 
-
 ### Disadvantages
 
 - Smaller desktop ecosystem
 - Less suitable for rich desktop applications
-
 
 Decision:
 
@@ -436,12 +411,10 @@ Rejected because the project focuses on desktop development.
 - Strong tooling
 - Enterprise support
 
-
 ### Disadvantages
 
 - Desktop ecosystem is smaller
 - Larger runtime requirements
-
 
 Decision:
 
@@ -461,7 +434,6 @@ Rust handles:
 - File operations
 - Heavy workloads
 
-
 ---
 
 ## Developer Experience
@@ -470,7 +442,6 @@ React provides:
 
 - Fast UI development
 - Component architecture
-
 
 ---
 
@@ -507,7 +478,6 @@ This architecture supports future features:
 - gRPC support
 - API automation
 - Cloud synchronization
-
 
 ---
 

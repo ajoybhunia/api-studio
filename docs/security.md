@@ -8,7 +8,6 @@ Protect:
 - API credentials
 - Local files
 
-
 ---
 
 # Sensitive Data
@@ -19,7 +18,6 @@ Never:
 - Store passwords in plain text
 - Expose secrets
 
-
 ---
 
 # Storage Security
@@ -28,7 +26,6 @@ Sensitive values should use:
 
 - Encryption
 - Secure storage APIs
-
 
 ---
 
@@ -39,7 +36,6 @@ Support:
 - HTTPS verification
 - Certificate handling
 - Secure connections
-
 
 ---
 

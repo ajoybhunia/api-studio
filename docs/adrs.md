@@ -1,13 +1,10 @@
 # Architecture Decision Records
 
-
 ## ADR-001: Use Tauri
-
 
 Decision:
 
 Use Tauri instead of Electron.
-
 
 Reason:
 
@@ -15,17 +12,13 @@ Reason:
 - Better performance
 - Native capabilities
 
-
-
 ---
 
 ## ADR-002: Use SQLite
 
-
 Decision:
 
 Use SQLite for persistence.
-
 
 Reason:
 

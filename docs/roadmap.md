@@ -14,7 +14,6 @@ Tasks:
 - Create navigation
 - Create theme system
 
-
 ---
 
 # Phase 2 - API Client Core
@@ -28,7 +27,6 @@ Tasks:
 - Query parameters
 - Request body
 
-
 ---
 
 # Phase 3 - Data Management
@@ -41,7 +39,6 @@ Tasks:
 - Request history
 - SQLite integration
 
-
 ---
 
 # Phase 4 - Authentication
@@ -52,7 +49,6 @@ Tasks:
 - Basic auth
 - API keys
 - OAuth
-
 
 ---
 
@@ -65,7 +61,6 @@ Tasks:
 - gRPC
 - SSE
 
-
 ---
 
 # Phase 6 - Automation
@@ -76,7 +71,6 @@ Tasks:
 - Request chaining
 - Test assertions
 - Workflows
-
 
 ---
 

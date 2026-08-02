@@ -47,13 +47,11 @@ The frontend is responsible for:
 - Application state
 - User interactions
 
-
 React provides:
 
 - Component-based architecture
 - Large ecosystem
 - Excellent developer tooling
-
 
 TypeScript provides:
 
@@ -76,7 +74,6 @@ Responsibilities:
 - Frontend/backend communication
 - Native system access
 - Application packaging
-
 
 Communication flow:
 
@@ -129,7 +126,6 @@ Used for:
 - File uploads
 - Streaming responses
 
-
 ---
 
 ## serde
@@ -144,7 +140,6 @@ Used for:
 - Configuration files
 - API collections
 - Request/response models
-
 
 ---
 
@@ -161,14 +156,12 @@ Used for storing:
 - Environments
 - Application settings
 
-
 SQLite is selected because it provides:
 
 - Local-first storage
 - No external database server
 - Fast reads/writes
 - Reliable persistence
-
 
 ---
 
@@ -183,7 +176,6 @@ Used for:
 - API tokens
 - Authentication secrets
 - Sensitive environment variables
-
 
 Credentials should not be stored as plain text.
 

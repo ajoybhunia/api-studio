@@ -9,7 +9,6 @@ Possible future improvements:
 - gRPC client
 - WebSocket debugging
 
-
 ---
 
 ## Developer Experience
@@ -19,7 +18,6 @@ Possible future improvements:
 - Extensions
 - Themes
 
-
 ---
 
 ## Automation
@@ -27,7 +25,6 @@ Possible future improvements:
 - API testing scripts
 - CI integration
 - Scheduled requests
-
 
 ---
 

@@ -44,13 +44,13 @@ User Service
 
 ## Fields
 
-| Field | Type | Description |
-|-------|------|-------------|
-| id | UUID | Unique identifier |
-| name | String | Collection name |
-| description | String | Optional description |
-| created_at | DateTime | Creation timestamp |
-| updated_at | DateTime | Last modified timestamp |
+| Field       | Type     | Description             |
+| ----------- | -------- | ----------------------- |
+| id          | UUID     | Unique identifier       |
+| name        | String   | Collection name         |
+| description | String   | Optional description    |
+| created_at  | DateTime | Creation timestamp      |
+| updated_at  | DateTime | Last modified timestamp |
 
 ---
 
@@ -62,19 +62,19 @@ Each request belongs to exactly one collection.
 
 ## Fields
 
-| Field | Type | Description |
-|-------|------|-------------|
-| id | UUID | Unique request identifier |
-| collection_id | UUID | Parent collection |
-| name | String | Display name |
-| method | String | HTTP method |
-| url | String | Endpoint URL |
-| headers | JSON | Request headers |
-| query_params | JSON | URL query parameters |
-| body | JSON/Text | Request body |
-| authentication | JSON | Authentication configuration |
-| created_at | DateTime | Creation timestamp |
-| updated_at | DateTime | Last modified timestamp |
+| Field          | Type      | Description                  |
+| -------------- | --------- | ---------------------------- |
+| id             | UUID      | Unique request identifier    |
+| collection_id  | UUID      | Parent collection            |
+| name           | String    | Display name                 |
+| method         | String    | HTTP method                  |
+| url            | String    | Endpoint URL                 |
+| headers        | JSON      | Request headers              |
+| query_params   | JSON      | URL query parameters         |
+| body           | JSON/Text | Request body                 |
+| authentication | JSON      | Authentication configuration |
+| created_at     | DateTime  | Creation timestamp           |
+| updated_at     | DateTime  | Last modified timestamp      |
 
 ---
 
@@ -108,13 +108,13 @@ Example:
 
 ## Fields
 
-| Field | Type | Description |
-|-------|------|-------------|
-| id | UUID | Unique identifier |
-| name | String | Environment name |
-| variables | JSON | Key-value variable collection |
-| created_at | DateTime | Creation timestamp |
-| updated_at | DateTime | Last modified timestamp |
+| Field      | Type     | Description                   |
+| ---------- | -------- | ----------------------------- |
+| id         | UUID     | Unique identifier             |
+| name       | String   | Environment name              |
+| variables  | JSON     | Key-value variable collection |
+| created_at | DateTime | Creation timestamp            |
+| updated_at | DateTime | Last modified timestamp       |
 
 ---
 
@@ -131,15 +131,15 @@ This enables users to:
 
 ## Fields
 
-| Field | Type | Description |
-|-------|------|-------------|
-| id | UUID | Unique history identifier |
-| request_id | UUID | Associated request |
-| response | JSON | Stored response data |
-| status_code | Integer | HTTP status |
-| duration | Integer | Response time (ms) |
-| response_size | Integer | Response size (bytes) |
-| timestamp | DateTime | Execution time |
+| Field         | Type     | Description               |
+| ------------- | -------- | ------------------------- |
+| id            | UUID     | Unique history identifier |
+| request_id    | UUID     | Associated request        |
+| response      | JSON     | Stored response data      |
+| status_code   | Integer  | HTTP status               |
+| duration      | Integer  | Response time (ms)        |
+| response_size | Integer  | Response size (bytes)     |
+| timestamp     | DateTime | Execution time            |
 
 ---
 

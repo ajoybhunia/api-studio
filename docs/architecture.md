@@ -25,9 +25,10 @@ The application consists of:
                             |
     ------------------------------------------------
     |              |              |                |
- reqwest        SQLx          keyring           tokio
-    |              |              |                |
-HTTP APIs      SQLite DB     Credentials      Async Tasks
+
+reqwest SQLx keyring tokio
+| | | |
+HTTP APIs SQLite DB Credentials Async Tasks
 
 ---
 

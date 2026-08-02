@@ -9,7 +9,6 @@ Install:
 - Cargo
 - SQLite
 
-
 ---
 
 # Running Development
@@ -21,7 +20,6 @@ npm install
 
 npm run dev
 ```
-
 
 Tauri:
 
@@ -55,7 +53,6 @@ Use:
 - ESLint
 - Prettier
 - Rustfmt
-
 
 ---
 

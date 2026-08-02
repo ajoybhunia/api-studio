@@ -1,0 +1,12 @@
+# Documentation & plain-text files
+*.md
+*.mdx
+*.txt
+*.rst
+*.adoc
+
+# Build/dependency output
+node_modules/
+/dist
+/test-results/
+/playwright-report/

@@ -1,6 +1,5 @@
 # API Studio Tech Stack
 
-
 ## Frontend
 
 ## React + TypeScript
@@ -12,7 +11,6 @@ Responsibilities:
 - State management
 - User interactions
 
-
 ---
 
 ## Vite
@@ -21,7 +19,6 @@ Used for:
 
 - Development server
 - Build process
-
 
 ---
 
@@ -34,7 +31,6 @@ Used for:
 - Native desktop application
 - Frontend/backend communication
 - Application packaging
-
 
 ---
 
@@ -49,7 +45,6 @@ Responsibilities:
 - Native operations
 - Security-sensitive features
 
-
 Libraries:
 
 - Tokio
@@ -57,7 +52,6 @@ Libraries:
 - Serde
 - SQLx
 - Keyring
-
 
 ---
 
@@ -73,7 +67,6 @@ Stores:
 - Environments
 - Settings
 
-
 ---
 
 # UI
@@ -82,16 +75,13 @@ Stores:
 
 Styling framework.
 
-
 ## shadcn/ui
 
 Reusable UI components.
 
-
 ## Radix UI
 
 Accessible UI primitives.
-
 
 ---
 
@@ -106,7 +96,6 @@ Used for:
 - Requests
 - Settings
 
-
 ---
 
 # Editor
@@ -119,7 +108,6 @@ Used for:
 - Request bodies
 - Scripts
 
-
 ---
 
 # Testing
@@ -129,7 +117,6 @@ Frontend:
 - Vitest
 - React Testing Library
 - Playwright
-
 
 Backend:
 

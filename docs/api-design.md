@@ -11,6 +11,7 @@ The application is designed to support multiple API protocols. The initial relea
 ## MVP
 
 ### REST
+
 The first version of the application will support REST APIs. Users can create, edit, send, and manage HTTP requests using standard HTTP methods.
 
 Supported methods include:
@@ -30,6 +31,7 @@ Supported methods include:
 The following protocols are planned for future releases:
 
 ### GraphQL
+
 Support for GraphQL queries and mutations with features such as:
 
 - Query editor
@@ -38,6 +40,7 @@ Support for GraphQL queries and mutations with features such as:
 - Schema introspection
 
 ### WebSocket
+
 Support for establishing persistent WebSocket connections, including:
 
 - Connect/Disconnect
@@ -46,6 +49,7 @@ Support for establishing persistent WebSocket connections, including:
 - Connection history
 
 ### gRPC
+
 Support for gRPC services using Protocol Buffer definitions, including:
 
 - Service discovery
