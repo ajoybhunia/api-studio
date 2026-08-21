@@ -10,3 +10,6 @@ node_modules/
 /dist
 /test-results/
 /playwright-report/
+
+# Tauri auto-generated files
+src-tauri/gen/
