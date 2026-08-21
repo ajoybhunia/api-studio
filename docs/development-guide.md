@@ -4,7 +4,7 @@
 
 Install:
 
-- Node.js
+- Node.js 22 LTS
 - Rust
 - Cargo
 - SQLite
