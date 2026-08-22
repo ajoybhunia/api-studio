@@ -110,46 +110,57 @@ docs: update architecture
 
 ## Overview
 
-API Studio uses GitHub Actions for continuous integration and delivery. The pipeline automatically validates code quality, runs tests, and builds the Tauri app for all platforms.
+API Studio uses GitHub Actions for continuous integration and delivery. The pipeline is split into two workflows for optimal developer experience:
 
-## Workflow Triggers
+| Workflow | File | Trigger | Purpose |
+|----------|------|---------|---------|
+| **Quality Gates** | `quality-gates.api-studio.yml` | Pull requests | Fast validation (~2-3 min) |
+| **CICD Pipeline** | `CICD.api-studio.yml` | Push to main | Full validation + builds (~10-15 min) |
 
-- **Push to `main`**: Runs full validation + build
-- **Pull requests**: Runs validation only
-- **Manual dispatch**: Available via GitHub UI
+Each workflow uses **separate jobs** for each task, enabling parallel execution and individual status checks.
 
-## Pipeline Jobs
+## Quality Gates (Pull Requests)
 
-### 1. Validate
+Runs on every pull request to `main`. Three parallel jobs:
 
-Runs on Ubuntu and performs:
+| Job | Purpose |
+|-----|---------|
+| **Type Check** | TypeScript type checking |
+| **Format Check** | Prettier format checking |
+| **Unit Tests** | Vitest unit tests |
 
-- TypeScript type checking
-- Prettier format checking
-- Unit tests (Vitest)
-- E2E tests (Playwright)
-- Rust tests (Cargo)
-- Secret scanning (trufflehog)
-- Dependency auditing (npm audit + cargo audit)
+## CICD Pipeline (Push to Main)
 
-### 2. Build
+Runs on every push to `main`. Full validation and builds with separate jobs:
 
-Runs on macOS, Linux, and Windows after validation passes:
+### Validation Jobs (parallel)
 
-- Builds Tauri desktop app for each platform
-- Produces artifacts: .app (macOS), .deb/.AppImage (Linux), .msi (Windows)
-- Artifacts retained for 30 days
+| Job | Purpose |
+|-----|---------|
+| **Type Check** | TypeScript type checking |
+| **Format Check** | Prettier format checking |
+| **Unit Tests** | Vitest unit tests |
+| **E2E Tests** | Playwright end-to-end tests |
+| **Rust Tests** | Cargo tests (with Linux dependencies) |
+| **Security Scan** | Trufflehog secret scanning |
+| **Dependency Audit** | npm audit + cargo audit |
 
-### 3. Security
+### Build Jobs (after validation)
 
-Runs security scans and uploads SARIF reports to GitHub Security tab.
+| Job | Platform | Artifacts |
+|-----|----------|-----------|
+| **Build (macOS)** | macOS-latest | .app, .dmg |
+| **Build (Linux)** | ubuntu-latest | .deb, .AppImage |
+| **Build (Windows)** | windows-latest | .msi, .exe |
+
+Artifacts retained for 30 days.
 
 **Secret scanning layers:**
 
 | Layer | Tool | Purpose |
 |-------|------|---------|
 | **Local (pre-commit)** | gitleaks | Fast, pattern-based scanning before commit |
-| **CI (GitHub Actions)** | trufflehog | Verified scans against live APIs, SARIF integration
+| **CI (GitHub Actions)** | trufflehog | Verified scans against live APIs |
 
 ## Running Locally
 
