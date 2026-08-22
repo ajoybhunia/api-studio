@@ -114,24 +114,14 @@ API Studio uses GitHub Actions for continuous integration and delivery. The pipe
 
 | Workflow | File | Trigger | Purpose |
 |----------|------|---------|---------|
-| **Quality Gates** | `quality-gates.api-studio.yml` | Pull requests | Fast validation (~2-3 min) |
-| **CICD Pipeline** | `CICD.api-studio.yml` | Push to main | Full validation + builds (~10-15 min) |
+| **CICD Pipeline** | `CICD.api-studio.yml` | Pull requests + Push to main | Validation checks + builds |
+| **Release** | `release.api-studio.yml` | Push to main | Post-merge release + deployment |
 
 Each workflow uses **separate jobs** for each task, enabling parallel execution and individual status checks.
 
-## Quality Gates (Pull Requests)
+## CICD Pipeline (Pull Requests + Push to Main)
 
-Runs on every pull request to `main`. Three parallel jobs:
-
-| Job | Purpose |
-|-----|---------|
-| **Type Check** | TypeScript type checking |
-| **Format Check** | Prettier format checking |
-| **Unit Tests** | Vitest unit tests |
-
-## CICD Pipeline (Push to Main)
-
-Runs on every push to `main`. Full validation and builds with separate jobs:
+Runs on every pull request to `main` and every push to `main`. Full validation and builds with separate jobs:
 
 ### Validation Jobs (parallel)
 
@@ -161,6 +151,15 @@ Artifacts retained for 30 days.
 |-------|------|---------|
 | **Local (pre-commit)** | gitleaks | Fast, pattern-based scanning before commit |
 | **CI (GitHub Actions)** | trufflehog | Verified scans against live APIs |
+
+## Release (Post-Merge)
+
+Runs only after merge to `main`. Handles post-merge actions:
+
+| Job | Purpose |
+|-----|---------|
+| **Create Release** | Create GitHub release + tag |
+| **Deploy** | Deploy to production |
 
 ## Running Locally
 
