@@ -71,7 +71,7 @@ bugfix/*
 
 ## Pre-commit Hooks
 
-Install pre-commit hooks to run secret scanning automatically before each commit:
+Install Git hooks to run quality checks automatically:
 
 ```bash
 # Install gitleaks (if not installed)
@@ -81,7 +81,13 @@ brew install gitleaks
 ./setup.sh
 ```
 
-This will configure Git to use the pre-commit hook in `.githooks/pre-commit`. Gitleaks will run automatically before every commit. If secrets are found, the commit will be blocked.
+This configures Git to use hooks in `.githooks/`. Three hooks are available:
+
+| Hook | Trigger | Checks |
+|------|---------|--------|
+| **pre-commit** | `git commit` | Gitleaks + Prettier + Typecheck + Unit + Rust |
+| **pre-merge-commit** | `git merge` | Gitleaks + Prettier + Typecheck (fast) |
+| **pre-push** | `git push` | Gitleaks + Prettier + Typecheck + Unit + Rust |
 
 ---
 

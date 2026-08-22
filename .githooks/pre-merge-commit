@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "Running pre-commit checks..."
+echo "Running pre-merge-commit checks..."
 
 # 1. Gitleaks secret scan
 echo "→ Secret scan..."
@@ -25,21 +25,4 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-# 4. Unit tests
-echo "→ Unit tests..."
-npm run test:run
-if [ $? -ne 0 ]; then
-  echo "❌ Unit tests failed!"
-  exit 1
-fi
-
-# 5. Rust tests
-echo "→ Rust tests..."
-cd src-tauri && cargo test
-if [ $? -ne 0 ]; then
-  echo "❌ Rust tests failed!"
-  exit 1
-fi
-cd ..
-
-echo "✓ All checks passed"
+echo "✓ Pre-merge checks passed"

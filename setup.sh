@@ -11,7 +11,11 @@ fi
 
 # Configure git to use custom hooks directory
 git config core.hooksPath .githooks
+
+# Make all hooks executable
 chmod +x .githooks/pre-commit
+chmod +x .githooks/pre-merge-commit
+chmod +x .githooks/pre-push
 
 echo "✓ Pre-commit hooks installed"
-echo "  Gitleaks will now run before every commit"
+echo "  Hooks: pre-commit, pre-merge-commit, pre-push"

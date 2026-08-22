@@ -1,11 +1,11 @@
 #!/bin/bash
-echo "Running pre-commit checks..."
+echo "Running pre-push checks..."
 
 # 1. Gitleaks secret scan
 echo "→ Secret scan..."
-gitleaks protect
+gitleaks detect
 if [ $? -ne 0 ]; then
-  echo "❌ Secrets detected! Commit blocked."
+  echo "❌ Secrets detected! Push blocked."
   exit 1
 fi
 
@@ -42,4 +42,4 @@ if [ $? -ne 0 ]; then
 fi
 cd ..
 
-echo "✓ All checks passed"
+echo "✓ All pre-push checks passed"
