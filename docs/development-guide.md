@@ -81,13 +81,14 @@ brew install gitleaks
 ./setup.sh
 ```
 
-This configures Git to use hooks in `.githooks/`. Three hooks are available:
+This configures Git to use hooks in `.githooks/`. Four hooks are available:
 
 | Hook | Trigger | Checks |
 |------|---------|--------|
 | **pre-commit** | `git commit` | Gitleaks + Prettier + Typecheck + Unit + Rust |
 | **pre-merge-commit** | `git merge` | Gitleaks + Prettier + Typecheck (fast) |
 | **pre-push** | `git push` | Gitleaks + Prettier + Typecheck + Unit + Rust |
+| **pre-rebase** | `git rebase` | Prevents rebasing main, warns about destructive ops |
 
 ---
 

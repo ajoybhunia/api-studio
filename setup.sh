@@ -16,6 +16,7 @@ git config core.hooksPath .githooks
 chmod +x .githooks/pre-commit
 chmod +x .githooks/pre-merge-commit
 chmod +x .githooks/pre-push
+chmod +x .githooks/pre-rebase
 
-echo "✓ Pre-commit hooks installed"
-echo "  Hooks: pre-commit, pre-merge-commit, pre-push"
+echo "✓ Git hooks installed"
+echo "  Hooks: pre-commit, pre-merge-commit, pre-push, pre-rebase"
