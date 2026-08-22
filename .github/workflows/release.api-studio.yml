@@ -1,7 +1,10 @@
 name: Release
 
 on:
-  push:
+  workflow_run:
+    workflows: ["CICD Pipeline"]
+    types:
+      - completed
     branches:
       - main
   workflow_dispatch:
@@ -12,6 +15,13 @@ concurrency:
 
 jobs:
   release:
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (
+        github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.event == 'push'
+      )
+
     name: Create Release
     runs-on: ubuntu-latest
     permissions:
@@ -34,7 +44,8 @@ jobs:
 
       - name: Create and push tag
         run: |
-          git tag -a v${{ steps.version.outputs.version }} -m "Release v${{ steps.version.outputs.version }}"
+          git tag -a v${{ steps.version.outputs.version }} \
+            -m "Release v${{ steps.version.outputs.version }}"
           git push origin v${{ steps.version.outputs.version }}
 
       - name: Create GitHub release
