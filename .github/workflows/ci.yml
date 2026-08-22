@@ -61,15 +61,7 @@ jobs:
 
       - name: Install Linux dependencies
         if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            libglib2.0-dev \
-            libgtk-3-dev \
-            libwebkit2gtk-4.1-dev \
-            libappindicator3-dev \
-            librsvg2-dev \
-            patchelf
+        uses: ./.github/actions/setup-linux
 
       - name: Rust tests
         run: cd src-tauri && cargo test
@@ -120,6 +112,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        uses: ./.github/actions/setup-linux
+
       - name: Build Tauri app
         run: npx tauri build
 
@@ -168,10 +164,4 @@ jobs:
       - name: Trufflehog scan
         uses: trufflesecurity/trufflehog@main
         with:
-          extra_args: --only-verified --json > trufflehog-results.json || true
-
-      - name: Upload Trufflehog SARIF
-        uses: github/codeql-action/upload-sarif@v3
-        if: always()
-        with:
-          sarif_file: trufflehog-results.json
+          extra_args: --only-verified
