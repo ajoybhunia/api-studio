@@ -74,14 +74,14 @@ bugfix/*
 Install pre-commit hooks to run secret scanning automatically before each commit:
 
 ```bash
-# Install pre-commit
-pip install pre-commit
+# Install gitleaks (if not installed)
+brew install gitleaks
 
-# Install hooks
-pre-commit install
+# Run setup script
+./setup.sh
 ```
 
-This will run gitleaks to detect secrets before every commit. If secrets are found, the commit will be blocked.
+This will configure Git to use the pre-commit hook in `.githooks/pre-commit`. Gitleaks will run automatically before every commit. If secrets are found, the commit will be blocked.
 
 ---
 
@@ -107,7 +107,7 @@ API Studio uses GitHub Actions for continuous integration and delivery. The pipe
 
 ## Workflow Triggers
 
-- **Push to `main` or `develop`**: Runs full validation + build
+- **Push to `main`**: Runs full validation + build
 - **Pull requests**: Runs validation only
 - **Manual dispatch**: Available via GitHub UI
 

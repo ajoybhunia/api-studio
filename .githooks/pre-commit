@@ -1,0 +1,8 @@
+#!/bin/bash
+echo "Running gitleaks secret scan..."
+gitleaks detect --staged
+if [ $? -ne 0 ]; then
+  echo "❌ Secrets detected! Commit blocked."
+  exit 1
+fi
+echo "✓ No secrets found"
