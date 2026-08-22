@@ -161,6 +161,53 @@ Runs only after merge to `main`. Handles post-merge actions:
 | **Create Release** | Create GitHub release + tag |
 | **Deploy** | Deploy to production |
 
+---
+
+# GitHub Ruleset Configuration
+
+## Branch Protection Rule for `main`
+
+Configure the following settings in your GitHub repository:
+
+**Settings → Branches → Add rule**
+
+| Setting | Value |
+|---------|-------|
+| Require pull request before merging | ✅ Enabled |
+| Require status checks to pass | ✅ Enabled |
+| Block force pushes | ✅ Enabled |
+| Restrict deletions | ✅ Enabled |
+
+## Required Status Checks
+
+These checks must pass before a PR can be merged:
+
+### CICD Pipeline Checks
+
+| Check | Job Name | Workflow |
+|-------|----------|----------|
+| Type Check | `typecheck` | CICD Pipeline |
+| Format Check | `format` | CICD Pipeline |
+| Unit Tests | `unit-tests` | CICD Pipeline |
+| E2E Tests | `e2e-tests` | CICD Pipeline |
+| Rust Tests | `rust-tests` | CICD Pipeline |
+| Security Scan | `security` | CICD Pipeline |
+| Dependency Audit | `audit` | CICD Pipeline |
+| Build (macos-latest) | `build (macos-latest)` | CICD Pipeline |
+| Build (ubuntu-latest) | `build (ubuntu-latest)` | CICD Pipeline |
+| Build (windows-latest) | `build (windows-latest)` | CICD Pipeline |
+
+### NOT Required (Post-Merge Only)
+
+These checks run only after merge and should NOT be required:
+
+| Check | Job Name | Workflow |
+|-------|----------|----------|
+| Create Release | `release` | Release |
+| Deploy | `deploy` | Release |
+
+**Reason:** They run on `push` to main, so they haven't executed yet when the PR is open. Requiring them would block the merge.
+
 ## Running Locally
 
 Before pushing, run these checks locally:
