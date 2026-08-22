@@ -1,0 +1,33 @@
+#!/bin/bash
+# Get the branch being rebased
+branch=$(git symbolic-ref HEAD 2>/dev/null | sed -e 's|^refs/heads/||')
+
+# Prevent rebasing main branch
+if [ "$branch" = "main" ]; then
+  echo "❌ Cannot rebase the main branch!"
+  echo "   Use feature branches for development."
+  exit 1
+fi
+
+# Warn about destructive operation
+echo "⚠️  Warning: Rebase will rewrite commit history."
+echo "   This can be destructive if commits are shared."
+echo ""
+
+# Check if upstream exists and has commits
+upstream=$(git rev-parse --verify "@{upstream}" 2>/dev/null)
+if [ -n "$upstream" ]; then
+  echo "   Branch '$branch' has upstream commits."
+  echo "   Consider using 'git pull' instead of 'git rebase'."
+  echo ""
+fi
+
+# Ask for confirmation
+read -p "   Continue with rebase? (y/N) " -n 1 -r
+echo
+if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+  echo "   Rebase cancelled."
+  exit 1
+fi
+
+echo "✓ Proceeding with rebase..."

@@ -1,0 +1,28 @@
+#!/bin/bash
+echo "Running pre-merge-commit checks..."
+
+# 1. Gitleaks secret scan
+echo "→ Secret scan..."
+gitleaks protect
+if [ $? -ne 0 ]; then
+  echo "❌ Secrets detected! Commit blocked."
+  exit 1
+fi
+
+# 2. Prettier format check
+echo "→ Format check..."
+npx prettier --check . --no-error-on-unmatched-pattern
+if [ $? -ne 0 ]; then
+  echo "❌ Formatting issues found! Run 'npm run format' to fix."
+  exit 1
+fi
+
+# 3. TypeScript type check
+echo "→ Type check..."
+npm run typecheck
+if [ $? -ne 0 ]; then
+  echo "❌ TypeScript errors found!"
+  exit 1
+fi
+
+echo "✓ Pre-merge checks passed"

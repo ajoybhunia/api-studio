@@ -1,0 +1,22 @@
+name: "Setup Rust"
+description: "Setup Rust stable, cache Cargo, install Linux deps"
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Rust stable
+      uses: dtolnay/rust-toolchain@stable
+
+    - name: Cache Cargo
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          src-tauri/target
+        key: ${{ runner.os }}-cargo-${{ hashFiles('src-tauri/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-cargo-
+
+    - name: Install Linux dependencies
+      uses: ./.github/actions/setup-linux
+      if: runner.os == 'Linux'

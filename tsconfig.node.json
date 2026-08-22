@@ -7,7 +7,5 @@
     "allowSyntheticDefaultImports": true,
     "types": ["node"]
   },
-  "include": [
-    "*.config.ts"
-  ]
+  "include": ["*.config.ts"]
 }
