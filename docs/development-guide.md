@@ -63,11 +63,25 @@ Branches:
 ```
 main
 
-develop
-
 feature/*
 bugfix/*
 ```
+
+---
+
+## Pre-commit Hooks
+
+Install pre-commit hooks to run secret scanning automatically before each commit:
+
+```bash
+# Install pre-commit
+pip install pre-commit
+
+# Install hooks
+pre-commit install
+```
+
+This will run gitleaks to detect secrets before every commit. If secrets are found, the commit will be blocked.
 
 ---
 
@@ -122,6 +136,13 @@ Runs on macOS, Linux, and Windows after validation passes:
 ### 3. Security
 
 Runs security scans and uploads SARIF reports to GitHub Security tab.
+
+**Secret scanning layers:**
+
+| Layer | Tool | Purpose |
+|-------|------|---------|
+| **Local (pre-commit)** | gitleaks | Fast, pattern-based scanning before commit |
+| **CI (GitHub Actions)** | trufflehog | Verified scans against live APIs, SARIF integration
 
 ## Running Locally
 
