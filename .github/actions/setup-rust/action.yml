@@ -1,11 +1,8 @@
 name: "Setup Rust"
-description: "Checkout, setup Rust stable, cache Cargo, install Linux deps"
+description: "Setup Rust stable, cache Cargo, install Linux deps"
 runs:
   using: "composite"
   steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-
     - name: Setup Rust stable
       uses: dtolnay/rust-toolchain@stable
 

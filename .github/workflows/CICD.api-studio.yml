@@ -15,6 +15,9 @@ jobs:
     name: Type Check
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - uses: ./.github/actions/setup-node
 
       - name: TypeScript type check
@@ -24,6 +27,9 @@ jobs:
     name: Format Check
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - uses: ./.github/actions/setup-node
 
       - name: Prettier format check
@@ -33,6 +39,9 @@ jobs:
     name: Unit Tests
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - uses: ./.github/actions/setup-node
 
       - name: Unit tests
@@ -42,6 +51,9 @@ jobs:
     name: E2E Tests
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - uses: ./.github/actions/setup-node
 
       - name: Install Playwright browsers
@@ -54,6 +66,9 @@ jobs:
     name: Rust Tests
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - uses: ./.github/actions/setup-rust
 
       - name: Rust tests
@@ -79,6 +94,9 @@ jobs:
     name: Dependency Audit
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - uses: ./.github/actions/setup-node
 
       - name: Setup Rust stable
@@ -102,6 +120,9 @@ jobs:
       matrix:
         platform: [macos-latest, ubuntu-latest, windows-latest]
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - uses: ./.github/actions/setup-node
 
       - uses: ./.github/actions/setup-rust

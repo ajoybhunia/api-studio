@@ -1,11 +1,8 @@
 name: "Setup Node.js"
-description: "Checkout, setup Node.js 22, install npm dependencies"
+description: "Setup Node.js 22 and install npm dependencies"
 runs:
   using: "composite"
   steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-
     - name: Setup Node.js 22 LTS
       uses: actions/setup-node@v4
       with:
