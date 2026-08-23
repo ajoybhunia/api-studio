@@ -1,17 +1,24 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { invoke } from "@tauri-apps/api/core";
 import { Button } from "@/components/ui/Button";
 import { useRequestStore } from "@/pages/request/requestStore";
 
 export function DashboardPage() {
   const [ping, setPing] = useState<string>("");
-  const openTab = useRequestStore((s) => s.openTab);
+  const navigate = useNavigate();
+  const createRequest = useRequestStore((s) => s.createRequest);
 
   useEffect(() => {
     invoke<string>("greet", { name: "developer" })
       .then(setPing)
       .catch(() => setPing("Backend unreachable"));
   }, []);
+
+  const handleNewRequest = () => {
+    const id = createRequest();
+    navigate(`/request/${id}`);
+  };
 
   return (
     <div className="flex h-full flex-col items-center justify-center gap-6 p-8 text-center">
@@ -27,13 +34,7 @@ export function DashboardPage() {
       </div>
 
       <div className="flex flex-wrap items-center justify-center gap-3">
-        <Button
-          onClick={() =>
-            openTab({ id: "new-request", title: "Untitled Request" })
-          }
-        >
-          New Request
-        </Button>
+        <Button onClick={handleNewRequest}>New Request</Button>
         <Button variant="outline">Import Collection</Button>
       </div>
 

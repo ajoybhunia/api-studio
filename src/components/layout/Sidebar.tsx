@@ -1,5 +1,6 @@
 import { Link, NavLink } from "react-router-dom";
 import { cn } from "@/lib/cn";
+import { version } from "../../../package.json";
 
 const NAV_ITEMS = [
   { to: "/", label: "Dashboard", end: true },
@@ -27,7 +28,7 @@ export function Sidebar() {
                 end={item.end}
                 className={({ isActive }) =>
                   cn(
-                    "block rounded-md px-2 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
+                    "block cursor-pointer rounded-md px-2 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
                     isActive && "bg-muted text-foreground",
                   )
                 }
@@ -40,8 +41,8 @@ export function Sidebar() {
       </nav>
 
       <div className="border-t border-border p-3 text-xs text-muted-foreground">
-        <Link to="/settings" className="hover:text-foreground">
-          API Studio v0.1.0
+        <Link to="/settings" className="cursor-pointer hover:text-foreground">
+          API Studio v{version}
         </Link>
       </div>
     </aside>
