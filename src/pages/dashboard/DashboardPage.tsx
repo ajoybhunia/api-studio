@@ -3,7 +3,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { Button } from "@/components/ui/Button";
 import { useRequestStore } from "@/pages/request/requestStore";
 
-export function Dashboard() {
+export function DashboardPage() {
   const [ping, setPing] = useState<string>("");
   const openTab = useRequestStore((s) => s.openTab);
 

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { HashRouter, Routes, Route } from "react-router-dom";
 import { AppShell } from "@/components/layout/AppShell";
-import { Dashboard } from "@/pages/dashboard/Dashboard";
+import { DashboardPage } from "@/pages/dashboard/DashboardPage";
 import { RequestPage } from "@/pages/request/RequestPage";
 import { CollectionPage } from "@/pages/collection/CollectionPage";
 import { EnvironmentPage } from "@/pages/environment/EnvironmentPage";
@@ -19,13 +19,13 @@ function App() {
     <HashRouter>
       <Routes>
         <Route element={<AppShell />}>
-          <Route index element={<Dashboard />} />
+          <Route index element={<DashboardPage />} />
           <Route path="request/:id" element={<RequestPage />} />
           <Route path="collections" element={<CollectionPage />} />
           <Route path="collections/:id" element={<CollectionPage />} />
           <Route path="environments" element={<EnvironmentPage />} />
           <Route path="settings" element={<SettingsPage />} />
-          <Route path="*" element={<Dashboard />} />
+          <Route path="*" element={<DashboardPage />} />
         </Route>
       </Routes>
     </HashRouter>
