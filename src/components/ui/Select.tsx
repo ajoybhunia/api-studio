@@ -9,7 +9,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
       <select
         ref={ref}
         className={cn(
-          "h-9 rounded-md border border-border bg-muted px-2 text-sm font-medium",
+          "h-9 cursor-pointer rounded-md border border-border bg-muted px-2 text-sm font-medium",
           "focus:outline-none focus:ring-2 focus:ring-accent",
           "disabled:pointer-events-none disabled:opacity-50",
           className,
