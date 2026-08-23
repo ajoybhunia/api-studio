@@ -151,11 +151,15 @@ api-studio/
 ├── src/                     # React frontend
 │   ├── components/
 │   │   ├── layout/          # AppShell, Sidebar, TopBar, StatusBar
-│   │   └── ui/              # Reusable UI primitives (Button)
-│   ├── pages/               # Route pages
-│   ├── stores/              # Zustand stores (theme, request, collection, environment)
-│   ├── lib/                 # Utilities (cn)
-│   ├── __tests__/           # Frontend unit tests
+│   │   └── ui/              # Button (+ Button.test.tsx)
+│   ├── pages/
+│   │   ├── dashboard/       # DashboardPage.tsx
+│   │   ├── collection/      # CollectionPage.tsx, collectionStore.ts
+│   │   ├── request/         # RequestPage.tsx, requestStore.ts
+│   │   ├── environment/     # EnvironmentPage.tsx, environmentStore.ts
+│   │   └── settings/        # SettingsPage.tsx
+│   ├── stores/              # themeStore.ts (+ themeStore.test.ts)
+│   ├── lib/                 # cn.ts (+ cn.test.ts)
 │   ├── test/                # Test setup (setup.ts)
 │   ├── App.tsx              # Router + theme init
 │   ├── main.tsx
