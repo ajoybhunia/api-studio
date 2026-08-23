@@ -3,6 +3,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { RequestPage } from "./RequestPage";
 import { useRequestStore } from "./requestStore";
+import { useResponseStore } from "@/stores/responseStore";
 
 function renderWithRouter(ui: React.ReactElement, route = "/") {
   return render(
@@ -22,6 +23,7 @@ describe("RequestPage", () => {
       activeTabId: null,
       requests: {},
     });
+    useResponseStore.setState({ responses: {} });
   });
 
   it("shows empty state when no request ID matches", () => {
@@ -106,13 +108,15 @@ describe("RequestPage", () => {
     useRequestStore
       .getState()
       .updateRequest(id, { url: "https://api.example.com" });
-    const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+    const sendRequestSpy = vi
+      .spyOn(useResponseStore.getState(), "sendRequest")
+      .mockImplementation(() => Promise.resolve());
     renderWithRouter(<RequestPage />, `/request/${id}`);
     fireEvent.keyDown(window, { key: "Enter", ctrlKey: true });
-    expect(consoleSpy).toHaveBeenCalledWith("Send request:", {
+    expect(sendRequestSpy).toHaveBeenCalledWith(id, {
       method: "GET",
       url: "https://api.example.com",
     });
-    consoleSpy.mockRestore();
+    sendRequestSpy.mockRestore();
   });
 });

@@ -2,7 +2,9 @@ import { useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/Button";
 import { useRequestStore } from "./requestStore";
+import { useResponseStore } from "@/stores/responseStore";
 import { RequestBar } from "./components/RequestBar";
+import { ResponsePanel } from "./components/ResponsePanel";
 
 export function RequestPage() {
   const { id } = useParams<{ id: string }>();
@@ -10,11 +12,18 @@ export function RequestPage() {
   const request = useRequestStore((s) => (id ? s.requests[id] : undefined));
   const updateRequest = useRequestStore((s) => s.updateRequest);
   const createRequest = useRequestStore((s) => s.createRequest);
+  const sendRequest = useResponseStore((s) => s.sendRequest);
+  const responseRecord = useResponseStore((s) =>
+    id ? s.responses[id] : undefined,
+  );
 
   const handleSend = useCallback(() => {
     if (!request) return;
-    console.log("Send request:", { method: request.method, url: request.url });
-  }, [request]);
+    sendRequest(request.id, {
+      method: request.method,
+      url: request.url,
+    });
+  }, [request, sendRequest]);
 
   if (!id || !request) {
     return (
@@ -36,12 +45,17 @@ export function RequestPage() {
   }
 
   return (
-    <div className="flex h-full flex-col">
-      <RequestBar
-        request={request}
-        onSend={handleSend}
-        onUpdate={(updates) => updateRequest(id, updates)}
-      />
+    <div className="flex h-full flex-row">
+      <div className="flex flex-1 flex-col">
+        <RequestBar
+          request={request}
+          onSend={handleSend}
+          onUpdate={(updates) => updateRequest(id, updates)}
+        />
+      </div>
+      <div className="flex flex-1 flex-col border-l border-border">
+        <ResponsePanel record={responseRecord} className="flex-1" />
+      </div>
     </div>
   );
 }
