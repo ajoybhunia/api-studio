@@ -72,7 +72,7 @@ The project uses Vitest for frontend unit tests, Playwright for end-to-end tests
 
 ### Unit tests (Vitest + React Testing Library)
 
-Located in `src/__tests__/` (mirroring the source structure):
+Located next to their implementations (co-located):
 
 ```bash
 npm run test         # watch mode
@@ -103,12 +103,18 @@ cargo test
 ```
 api-studio/
 ├── src/                    # React frontend
-│   ├── components/         # Layout & UI primitives
-│   ├── pages/              # Route pages
-│   ├── stores/             # Zustand stores
-│   ├── lib/                # Utilities
-│   ├── __tests__/          # Frontend unit tests
-│   └── test/               # Test setup (jest-dom, mocks)
+│   ├── components/
+│   │   ├── layout/         # AppShell, Sidebar, TopBar, StatusBar
+│   │   └── ui/             # Button (+ Button.test.tsx)
+│   ├── pages/
+│   │   ├── dashboard/      # DashboardPage.tsx
+│   │   ├── collection/     # CollectionPage.tsx, collectionStore.ts
+│   │   ├── request/        # RequestPage.tsx, requestStore.ts
+│   │   ├── environment/    # EnvironmentPage.tsx, environmentStore.ts
+│   │   └── settings/       # SettingsPage.tsx
+│   ├── stores/             # themeStore.ts (+ themeStore.test.ts)
+│   ├── lib/                # cn.ts (+ cn.test.ts)
+│   └── test/               # Test setup (setup.ts)
 ├── e2e/                    # Playwright end-to-end tests
 ├── src-tauri/              # Rust backend + Tauri config
 │   └── src/                # Rust source (lib.rs, main.rs)
