@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { Button } from "@/components/ui/Button";
-import { useRequestStore } from "@/stores/requestStore";
+import { useRequestStore } from "@/pages/request/requestStore";
 
 export function Dashboard() {
   const [ping, setPing] = useState<string>("");

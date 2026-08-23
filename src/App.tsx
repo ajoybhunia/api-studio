@@ -1,11 +1,11 @@
 import { useEffect } from "react";
 import { HashRouter, Routes, Route } from "react-router-dom";
 import { AppShell } from "@/components/layout/AppShell";
-import { Dashboard } from "@/pages/Dashboard";
-import { RequestPage } from "@/pages/RequestPage";
-import { CollectionPage } from "@/pages/CollectionPage";
-import { EnvironmentPage } from "@/pages/EnvironmentPage";
-import { SettingsPage } from "@/pages/SettingsPage";
+import { Dashboard } from "@/pages/dashboard/Dashboard";
+import { RequestPage } from "@/pages/request/RequestPage";
+import { CollectionPage } from "@/pages/collection/CollectionPage";
+import { EnvironmentPage } from "@/pages/environment/EnvironmentPage";
+import { SettingsPage } from "@/pages/settings/SettingsPage";
 import { useThemeStore } from "@/stores/themeStore";
 
 function App() {
