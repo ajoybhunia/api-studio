@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Button } from "@/components/ui/Button";
+import { Dropdown } from "@/components/ui/Dropdown";
 import { Input } from "@/components/ui/Input";
-import { Select } from "@/components/ui/Select";
 import type { HttpMethod, RequestData } from "../requestStore";
 
 const HTTP_METHODS: HttpMethod[] = [
@@ -13,6 +13,8 @@ const HTTP_METHODS: HttpMethod[] = [
   "HEAD",
   "OPTIONS",
 ];
+
+const METHOD_OPTIONS = HTTP_METHODS.map((m) => ({ value: m, label: m }));
 
 interface RequestBarProps {
   request: RequestData;
@@ -34,16 +36,11 @@ export function RequestBar({ request, onSend, onUpdate }: RequestBarProps) {
 
   return (
     <div className="flex items-center gap-2 border-b border-border p-2">
-      <Select
+      <Dropdown
+        options={METHOD_OPTIONS}
         value={request.method}
-        onChange={(e) => onUpdate({ method: e.target.value as HttpMethod })}
-      >
-        {HTTP_METHODS.map((method) => (
-          <option key={method} value={method}>
-            {method}
-          </option>
-        ))}
-      </Select>
+        onChange={(method) => onUpdate({ method: method as HttpMethod })}
+      />
 
       <Input
         type="text"

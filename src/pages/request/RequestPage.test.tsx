@@ -33,7 +33,7 @@ describe("RequestPage", () => {
   it("renders request editor when valid request ID", () => {
     const id = useRequestStore.getState().createRequest();
     renderWithRouter(<RequestPage />, `/request/${id}`);
-    expect(screen.getByRole("combobox")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "GET" })).toBeInTheDocument();
     expect(
       screen.getByPlaceholderText("Enter request URL"),
     ).toBeInTheDocument();
@@ -43,8 +43,9 @@ describe("RequestPage", () => {
   it("displays default GET method", () => {
     const id = useRequestStore.getState().createRequest();
     renderWithRouter(<RequestPage />, `/request/${id}`);
-    const select = screen.getByRole("combobox") as HTMLSelectElement;
-    expect(select.value).toBe("GET");
+    expect(screen.getByRole("button", { name: "GET" })).toHaveTextContent(
+      "GET",
+    );
   });
 
   it("displays empty URL by default", () => {
@@ -74,8 +75,8 @@ describe("RequestPage", () => {
   it("updates method in store when select changes", () => {
     const id = useRequestStore.getState().createRequest();
     renderWithRouter(<RequestPage />, `/request/${id}`);
-    const select = screen.getByRole("combobox") as HTMLSelectElement;
-    fireEvent.change(select, { target: { value: "POST" } });
+    fireEvent.click(screen.getByRole("button", { name: "GET" }));
+    fireEvent.click(screen.getByRole("option", { name: "POST" }));
     expect(useRequestStore.getState().requests[id].method).toBe("POST");
   });
 

@@ -4,7 +4,7 @@ test.describe("Request Editor", () => {
   test("creates new request and navigates to editor", async ({ page }) => {
     await page.goto("/");
     await page.getByRole("button", { name: "New Request" }).click();
-    await expect(page.getByRole("combobox")).toBeVisible();
+    await expect(page.getByRole("button", { name: "GET" })).toBeVisible();
     await expect(page.getByPlaceholder("Enter request URL")).toBeVisible();
     await expect(page.getByRole("button", { name: "Send" })).toBeVisible();
   });
@@ -25,10 +25,11 @@ test.describe("Request Editor", () => {
     await page.goto("/");
     await page.getByRole("button", { name: "New Request" }).click();
 
-    const select = page.getByRole("combobox");
-    await expect(select).toHaveValue("GET");
+    const dropdown = page.getByRole("button", { name: "GET" });
+    await expect(dropdown).toHaveText("GET");
 
-    await select.selectOption("POST");
-    await expect(select).toHaveValue("POST");
+    await dropdown.click();
+    await page.getByRole("option", { name: "POST" }).click();
+    await expect(page.getByRole("button", { name: "POST" })).toBeVisible();
   });
 });
