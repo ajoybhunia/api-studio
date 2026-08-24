@@ -103,6 +103,15 @@ describe("RequestPage", () => {
     expect(ids).toHaveLength(1);
   });
 
+  it("renders editor tabs", () => {
+    const id = useRequestStore.getState().createRequest();
+    renderWithRouter(<RequestPage />, `/request/${id}`);
+    expect(screen.getByRole("button", { name: "Params" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Body" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Auth" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Headers" })).toBeInTheDocument();
+  });
+
   it("triggers onSend on Ctrl+Enter", () => {
     const id = useRequestStore.getState().createRequest();
     useRequestStore
@@ -116,7 +125,98 @@ describe("RequestPage", () => {
     expect(sendRequestSpy).toHaveBeenCalledWith(id, {
       method: "GET",
       url: "https://api.example.com",
+      headers: undefined,
+      body: undefined,
     });
+    sendRequestSpy.mockRestore();
+  });
+
+  it("sends request with query params merged into url", () => {
+    const id = useRequestStore.getState().createRequest();
+    useRequestStore
+      .getState()
+      .updateRequest(id, { url: "https://api.example.com/users" });
+    useRequestStore.getState().updateRequest(id, {
+      queryParams: [
+        { id: "p1", key: "page", value: "1", enabled: true },
+        { id: "p2", key: "limit", value: "10", enabled: true },
+      ],
+    });
+    const sendRequestSpy = vi
+      .spyOn(useResponseStore.getState(), "sendRequest")
+      .mockImplementation(() => Promise.resolve());
+    renderWithRouter(<RequestPage />, `/request/${id}`);
+    fireEvent.keyDown(window, { key: "Enter", ctrlKey: true });
+    expect(sendRequestSpy).toHaveBeenCalledWith(id, {
+      method: "GET",
+      url: "https://api.example.com/users?page=1&limit=10",
+      headers: undefined,
+      body: undefined,
+    });
+    sendRequestSpy.mockRestore();
+  });
+
+  it("sends request with enabled headers", () => {
+    const id = useRequestStore.getState().createRequest();
+    useRequestStore
+      .getState()
+      .updateRequest(id, { url: "https://api.example.com" });
+    useRequestStore.getState().updateRequest(id, {
+      headers: [
+        { id: "h1", key: "X-Custom", value: "test", enabled: true },
+        { id: "h2", key: "X-Disabled", value: "no", enabled: false },
+      ],
+    });
+    const sendRequestSpy = vi
+      .spyOn(useResponseStore.getState(), "sendRequest")
+      .mockImplementation(() => Promise.resolve());
+    renderWithRouter(<RequestPage />, `/request/${id}`);
+    fireEvent.keyDown(window, { key: "Enter", ctrlKey: true });
+    expect(sendRequestSpy).toHaveBeenCalledWith(id, {
+      method: "GET",
+      url: "https://api.example.com",
+      headers: { "X-Custom": "test" },
+      body: undefined,
+    });
+    sendRequestSpy.mockRestore();
+  });
+
+  it("sends request with bearer auth header", () => {
+    const id = useRequestStore.getState().createRequest();
+    useRequestStore
+      .getState()
+      .updateRequest(id, { url: "https://api.example.com" });
+    useRequestStore.getState().updateRequest(id, {
+      auth: { type: "bearer", token: "abc123", username: "", password: "" },
+    });
+    const sendRequestSpy = vi
+      .spyOn(useResponseStore.getState(), "sendRequest")
+      .mockImplementation(() => Promise.resolve());
+    renderWithRouter(<RequestPage />, `/request/${id}`);
+    fireEvent.keyDown(window, { key: "Enter", ctrlKey: true });
+    expect(sendRequestSpy).toHaveBeenCalledWith(id, {
+      method: "GET",
+      url: "https://api.example.com",
+      headers: { Authorization: "Bearer abc123" },
+      body: undefined,
+    });
+    sendRequestSpy.mockRestore();
+  });
+
+  it("blocks send when json body is invalid", () => {
+    const id = useRequestStore.getState().createRequest();
+    useRequestStore
+      .getState()
+      .updateRequest(id, { url: "https://api.example.com" });
+    useRequestStore.getState().updateRequest(id, {
+      body: { type: "json", content: "{ invalid }" },
+    });
+    const sendRequestSpy = vi
+      .spyOn(useResponseStore.getState(), "sendRequest")
+      .mockImplementation(() => Promise.resolve());
+    renderWithRouter(<RequestPage />, `/request/${id}`);
+    fireEvent.keyDown(window, { key: "Enter", ctrlKey: true });
+    expect(sendRequestSpy).not.toHaveBeenCalled();
     sendRequestSpy.mockRestore();
   });
 });

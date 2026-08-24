@@ -1,9 +1,10 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/Button";
 import { useRequestStore } from "./requestStore";
 import { useResponseStore } from "@/stores/responseStore";
 import { RequestBar } from "./components/RequestBar";
+import { RequestEditor } from "./components/RequestEditor";
 import { ResponsePanel } from "./components/ResponsePanel";
 
 export function RequestPage() {
@@ -17,13 +18,62 @@ export function RequestPage() {
     id ? s.responses[id] : undefined,
   );
 
+  const isJsonBodyInvalid = useMemo(() => {
+    if (!request || request.body.type !== "json") return false;
+    if (!request.body.content.trim()) return false;
+    try {
+      JSON.parse(request.body.content);
+      return false;
+    } catch {
+      return true;
+    }
+  }, [request]);
+
   const handleSend = useCallback(() => {
-    if (!request) return;
+    if (!request || isJsonBodyInvalid) return;
+
+    const enabledParams = request.queryParams.filter(
+      (p) => p.enabled && p.key.trim(),
+    );
+    let finalUrl = request.url;
+    if (enabledParams.length > 0) {
+      const queryString = enabledParams
+        .map(
+          (p) => `${encodeURIComponent(p.key)}=${encodeURIComponent(p.value)}`,
+        )
+        .join("&");
+      const separator = finalUrl.includes("?") ? "&" : "?";
+      finalUrl = `${finalUrl}${separator}${queryString}`;
+    }
+
+    const headers: Record<string, string> = {};
+    for (const h of request.headers) {
+      if (h.enabled && h.key.trim()) {
+        headers[h.key] = h.value;
+      }
+    }
+
+    if (request.auth.type === "bearer" && request.auth.token) {
+      headers["Authorization"] = `Bearer ${request.auth.token}`;
+    } else if (request.auth.type === "basic") {
+      const encoded = btoa(`${request.auth.username}:${request.auth.password}`);
+      headers["Authorization"] = `Basic ${encoded}`;
+    }
+
+    if (request.body.type === "json" && !headers["Content-Type"]) {
+      headers["Content-Type"] = "application/json";
+    }
+
+    const body =
+      request.body.type !== "none" ? request.body.content : undefined;
+
     sendRequest(request.id, {
       method: request.method,
-      url: request.url,
+      url: finalUrl,
+      headers: Object.keys(headers).length > 0 ? headers : undefined,
+      body,
     });
-  }, [request, sendRequest]);
+  }, [request, sendRequest, isJsonBodyInvalid]);
 
   if (!id || !request) {
     return (
@@ -45,16 +95,20 @@ export function RequestPage() {
   }
 
   return (
-    <div className="flex h-full flex-row">
-      <div className="flex flex-1 flex-col">
-        <RequestBar
+    <div className="flex h-full flex-col">
+      <RequestBar
+        request={request}
+        onSend={handleSend}
+        onUpdate={(updates) => updateRequest(id, updates)}
+      />
+      <div className="h-72 shrink-0 overflow-auto border-b border-border">
+        <RequestEditor
           request={request}
-          onSend={handleSend}
           onUpdate={(updates) => updateRequest(id, updates)}
         />
       </div>
-      <div className="flex flex-1 flex-col border-l border-border">
-        <ResponsePanel record={responseRecord} className="flex-1" />
+      <div className="flex-1 overflow-auto">
+        <ResponsePanel record={responseRecord} className="h-full" />
       </div>
     </div>
   );

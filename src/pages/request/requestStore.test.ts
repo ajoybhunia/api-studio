@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { useRequestStore } from "./requestStore";
+import { useRequestStore, buildRequestName } from "./requestStore";
 
 describe("useRequestStore", () => {
   beforeEach(() => {
@@ -25,7 +25,17 @@ describe("useRequestStore", () => {
       expect(request).toBeDefined();
       expect(request.method).toBe("GET");
       expect(request.url).toBe("");
-      expect(request.name).toBe("Untitled Request");
+      expect(request.name).toBe("GET Untitled");
+      expect(request.headers).toEqual([]);
+      expect(request.queryParams).toEqual([]);
+      expect(request.auth).toEqual({
+        type: "none",
+        token: "",
+        username: "",
+        password: "",
+      });
+      expect(request.body).toEqual({ type: "none", content: "" });
+      expect(request.activeEditorTab).toBe("params");
     });
 
     it("opens a tab for the new request", () => {
@@ -59,6 +69,34 @@ describe("useRequestStore", () => {
       const originalId = useRequestStore.getState().getRequest(id)?.id;
       useRequestStore.getState().updateRequest(id, { name: "New Name" });
       expect(useRequestStore.getState().getRequest(id)?.id).toBe(originalId);
+    });
+
+    it("auto-updates name when url changes", () => {
+      const id = useRequestStore.getState().createRequest();
+      useRequestStore
+        .getState()
+        .updateRequest(id, { url: "https://api.example.com/users" });
+      const request = useRequestStore.getState().requests[id];
+      expect(request.name).toBe("GET /users");
+    });
+
+    it("auto-updates name when method changes", () => {
+      const id = useRequestStore.getState().createRequest();
+      useRequestStore
+        .getState()
+        .updateRequest(id, { url: "https://api.example.com/users" });
+      useRequestStore.getState().updateRequest(id, { method: "POST" });
+      const request = useRequestStore.getState().requests[id];
+      expect(request.name).toBe("POST /users");
+    });
+
+    it("updates tab title when name changes", () => {
+      const id = useRequestStore.getState().createRequest();
+      useRequestStore
+        .getState()
+        .updateRequest(id, { url: "https://api.example.com/posts" });
+      const tab = useRequestStore.getState().openTabs.find((t) => t.id === id);
+      expect(tab?.title).toBe("GET /posts");
     });
   });
 
@@ -101,5 +139,35 @@ describe("useRequestStore", () => {
       useRequestStore.getState().closeTab(id);
       expect(useRequestStore.getState().activeTabId).toBeNull();
     });
+  });
+});
+
+describe("buildRequestName", () => {
+  it("returns method + Untitled when url is empty", () => {
+    expect(buildRequestName("GET", "")).toBe("GET Untitled");
+  });
+
+  it("returns method + path for valid url", () => {
+    expect(buildRequestName("GET", "https://api.example.com/users")).toBe(
+      "GET /users",
+    );
+  });
+
+  it("returns root path for base url", () => {
+    expect(buildRequestName("POST", "https://api.example.com")).toBe("POST /");
+  });
+
+  it("strips query string from path", () => {
+    expect(
+      buildRequestName("GET", "https://api.example.com/users?page=1"),
+    ).toBe("GET /users");
+  });
+
+  it("handles invalid url as path", () => {
+    expect(buildRequestName("GET", "/api/users")).toBe("GET /api/users");
+  });
+
+  it("handles url with only method and no path", () => {
+    expect(buildRequestName("DELETE", "")).toBe("DELETE Untitled");
   });
 });
