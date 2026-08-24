@@ -1,13 +1,8 @@
 mod commands;
 
-/// Placeholder IPC command used to verify the frontend <-> backend bridge.
-/// Real request execution and persistence will be wired up in later phases.
 #[tauri::command]
-fn ping() -> String {
-    format!(
-        "pong from API Studio backend v{}",
-        env!("CARGO_PKG_VERSION")
-    )
+fn ping() -> &'static str {
+    "pong"
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -27,8 +22,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn ping_returns_backend_banner() {
-        let msg = ping();
-        assert!(msg.starts_with("pong from API Studio backend v"));
+    fn ping_returns_pong() {
+        assert_eq!(ping(), "pong");
     }
 }

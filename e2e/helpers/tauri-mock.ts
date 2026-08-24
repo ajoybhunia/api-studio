@@ -13,7 +13,7 @@ interface MockError {
 type MockHandler = (args: Record<string, unknown>) => Promise<unknown>;
 
 const defaultHandlers: Record<string, MockHandler> = {
-  ping: () => Promise.resolve("pong from API Studio backend"),
+  ping: () => Promise.resolve("pong"),
 
   send_request: (args) => {
     const url = ((args?.args as Record<string, unknown>)?.url as string) || "";
@@ -56,13 +56,12 @@ export function createTauriMockScript(
   `;
 }
 
-export function tauriMockScript(version?: string): string {
-  const v = version ? ` v${version}` : "";
+export function tauriMockScript(_version?: string): string {
   return `
     window.__TAURI_INTERNALS__ = {
       invoke: (cmd, args) => {
         if (cmd === "ping") {
-          return Promise.resolve("pong from API Studio backend${v}");
+          return Promise.resolve("pong");
         }
         if (cmd === "send_request") {
           const url = (args?.args || {}).url || "";
@@ -82,13 +81,12 @@ export function tauriMockScript(version?: string): string {
   `;
 }
 
-export function tauriMockScriptSlow(version?: string): string {
-  const v = version ? ` v${version}` : "";
+export function tauriMockScriptSlow(_version?: string): string {
   return `
     window.__TAURI_INTERNALS__ = {
       invoke: (cmd, args) => {
         if (cmd === "ping") {
-          return Promise.resolve("pong from API Studio backend${v}");
+          return Promise.resolve("pong");
         }
         if (cmd === "send_request") {
           return new Promise((resolve) => {

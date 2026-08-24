@@ -47,8 +47,12 @@ describe("Sidebar", () => {
   it("lists requests from store", () => {
     const id1 = useRequestStore.getState().createRequest();
     const id2 = useRequestStore.getState().createRequest();
-    useRequestStore.getState().updateRequest(id1, { url: "https://a.com/users" });
-    useRequestStore.getState().updateRequest(id2, { url: "https://b.com/posts" });
+    useRequestStore
+      .getState()
+      .updateRequest(id1, { url: "https://a.com/users" });
+    useRequestStore
+      .getState()
+      .updateRequest(id2, { url: "https://b.com/posts" });
     renderSidebar();
     expect(screen.getByText("GET /users")).toBeInTheDocument();
     expect(screen.getByText("GET /posts")).toBeInTheDocument();

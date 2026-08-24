@@ -6,9 +6,7 @@ vi.mock("@tauri-apps/api/core", () => ({
   invoke: vi.fn(),
 }));
 
-const mockInvoke = vi.mocked(
-  (await import("@tauri-apps/api/core")).invoke,
-);
+const mockInvoke = vi.mocked((await import("@tauri-apps/api/core")).invoke);
 
 describe("StatusBar", () => {
   beforeEach(() => {
