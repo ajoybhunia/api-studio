@@ -10,7 +10,7 @@ export function DashboardPage() {
   const createRequest = useRequestStore((s) => s.createRequest);
 
   useEffect(() => {
-    invoke<string>("greet", { name: "developer" })
+    invoke<string>("ping")
       .then(setPing)
       .catch(() => setPing("Backend unreachable"));
   }, []);
@@ -39,7 +39,7 @@ export function DashboardPage() {
       </div>
 
       <p className="text-xs text-muted-foreground">
-        Request editor, collections, and history are coming in the next phases.
+        Create a new request to get started.
       </p>
     </div>
   );

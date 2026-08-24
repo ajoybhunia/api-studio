@@ -13,7 +13,7 @@ interface MockError {
 type MockHandler = (args: Record<string, unknown>) => Promise<unknown>;
 
 const defaultHandlers: Record<string, MockHandler> = {
-  greet: () => Promise.resolve("pong from API Studio backend v0.2.0"),
+  ping: () => Promise.resolve("pong from API Studio backend"),
 
   send_request: (args) => {
     const url = ((args?.args as Record<string, unknown>)?.url as string) || "";
@@ -56,12 +56,13 @@ export function createTauriMockScript(
   `;
 }
 
-export function tauriMockScript(): string {
+export function tauriMockScript(version?: string): string {
+  const v = version ? ` v${version}` : "";
   return `
     window.__TAURI_INTERNALS__ = {
       invoke: (cmd, args) => {
-        if (cmd === "greet") {
-          return Promise.resolve("pong from API Studio backend v0.2.0");
+        if (cmd === "ping") {
+          return Promise.resolve("pong from API Studio backend${v}");
         }
         if (cmd === "send_request") {
           const url = (args?.args || {}).url || "";
@@ -81,12 +82,13 @@ export function tauriMockScript(): string {
   `;
 }
 
-export function tauriMockScriptSlow(): string {
+export function tauriMockScriptSlow(version?: string): string {
+  const v = version ? ` v${version}` : "";
   return `
     window.__TAURI_INTERNALS__ = {
       invoke: (cmd, args) => {
-        if (cmd === "greet") {
-          return Promise.resolve("pong from API Studio backend v0.2.0");
+        if (cmd === "ping") {
+          return Promise.resolve("pong from API Studio backend${v}");
         }
         if (cmd === "send_request") {
           return new Promise((resolve) => {

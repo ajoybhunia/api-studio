@@ -1,5 +1,13 @@
 import { test, expect } from "@playwright/test";
+import { readFileSync } from "fs";
+import { dirname, resolve } from "path";
+import { fileURLToPath } from "url";
 import { tauriMockScript, tauriMockScriptSlow } from "./helpers/tauri-mock";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const { version } = JSON.parse(
+  readFileSync(resolve(__dirname, "../package.json"), "utf-8"),
+);
 
 test.describe("Request Editor", () => {
   test("creates new request and navigates to editor", async ({ page }) => {
@@ -94,7 +102,7 @@ test.describe("Sidebar Request List", () => {
 
 test.describe("Query Params", () => {
   test.beforeEach(async ({ page }) => {
-    await page.addInitScript({ content: tauriMockScript() });
+    await page.addInitScript({ content: tauriMockScript(version) });
   });
 
   test("adds query param and updates url", async ({ page }) => {
@@ -117,7 +125,7 @@ test.describe("Query Params", () => {
 
 test.describe("Headers Editor", () => {
   test.beforeEach(async ({ page }) => {
-    await page.addInitScript({ content: tauriMockScript() });
+    await page.addInitScript({ content: tauriMockScript(version) });
   });
 
   test("adds header row", async ({ page }) => {
@@ -201,7 +209,7 @@ test.describe("Body Editor", () => {
 
 test.describe("Response Panel States", () => {
   test("shows default empty state", async ({ page }) => {
-    await page.addInitScript({ content: tauriMockScript() });
+    await page.addInitScript({ content: tauriMockScript(version) });
     await page.goto("/");
     await page.getByRole("button", { name: "New Request" }).click();
     await expect(
@@ -210,7 +218,7 @@ test.describe("Response Panel States", () => {
   });
 
   test("shows loading state", async ({ page }) => {
-    await page.addInitScript({ content: tauriMockScriptSlow() });
+    await page.addInitScript({ content: tauriMockScriptSlow(version) });
     await page.goto("/");
     await page.getByRole("button", { name: "New Request" }).click();
 
@@ -223,7 +231,7 @@ test.describe("Response Panel States", () => {
   });
 
   test("shows success response", async ({ page }) => {
-    await page.addInitScript({ content: tauriMockScript() });
+    await page.addInitScript({ content: tauriMockScript(version) });
     await page.goto("/");
     await page.getByRole("button", { name: "New Request" }).click();
 
@@ -238,7 +246,7 @@ test.describe("Response Panel States", () => {
   });
 
   test("shows error state", async ({ page }) => {
-    await page.addInitScript({ content: tauriMockScript() });
+    await page.addInitScript({ content: tauriMockScript(version) });
     await page.goto("/");
     await page.getByRole("button", { name: "New Request" }).click();
 

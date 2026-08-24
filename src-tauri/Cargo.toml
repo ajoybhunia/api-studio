@@ -1,6 +1,6 @@
 [package]
 name = "api-studio"
-version = "0.3.0"
+version = "1.0.0"
 description = "API Studio - a modern, lightweight, Git-friendly API development platform"
 authors = ["you"]
 edition = "2021"

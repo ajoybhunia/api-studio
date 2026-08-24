@@ -1,6 +1,5 @@
-import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { cn } from "@/lib/cn";
-import { version } from "../../../package.json";
 import { useRequestStore } from "@/pages/request/requestStore";
 import type { HttpMethod } from "@/pages/request/requestStore";
 
@@ -132,9 +131,7 @@ export function Sidebar() {
       </div>
 
       <div className="border-t border-border p-3 text-xs text-muted-foreground">
-        <Link to="/settings" className="cursor-pointer hover:text-foreground">
-          API Studio v{version}
-        </Link>
+        API Studio
       </div>
     </aside>
   );
