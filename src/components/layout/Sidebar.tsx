@@ -129,10 +129,6 @@ export function Sidebar() {
           </ul>
         </nav>
       </div>
-
-      <div className="border-t border-border p-3 text-xs text-muted-foreground">
-        API Studio
-      </div>
     </aside>
   );
 }

@@ -12,7 +12,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest",
-    "test:run": "vitest run",
+    "test:run": "NODE_OPTIONS='--disable-warning=ExperimentalWarning' vitest run",
     "test:e2e": "playwright test"
   },
   "dependencies": {
