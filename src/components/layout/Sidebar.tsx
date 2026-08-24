@@ -1,13 +1,14 @@
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
+import { LayoutDashboard, FolderOpen, Globe, Settings } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { useRequestStore } from "@/pages/request/requestStore";
 import type { HttpMethod } from "@/pages/request/requestStore";
 
 const NAV_ITEMS = [
-  { to: "/", label: "Dashboard", end: true },
-  { to: "/collections", label: "Collections" },
-  { to: "/environments", label: "Environments" },
-  { to: "/settings", label: "Settings" },
+  { to: "/", label: "Dashboard", icon: LayoutDashboard, end: true },
+  { to: "/collections", label: "Collections", icon: FolderOpen },
+  { to: "/environments", label: "Environments", icon: Globe },
+  { to: "/settings", label: "Settings", icon: Settings },
 ];
 
 const METHOD_COLORS: Record<HttpMethod, string> = {
@@ -106,9 +107,6 @@ export function Sidebar() {
         </ul>
 
         <nav className="border-t border-border p-2">
-          <p className="px-2 pb-2 pt-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Workspace
-          </p>
           <ul className="space-y-0.5">
             {NAV_ITEMS.map((item) => (
               <li key={item.to}>
@@ -117,11 +115,12 @@ export function Sidebar() {
                   end={item.end}
                   className={({ isActive }) =>
                     cn(
-                      "block cursor-pointer rounded-md px-2 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
+                      "flex items-center gap-2 cursor-pointer rounded-md px-2 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
                       isActive && "bg-muted text-foreground",
                     )
                   }
                 >
+                  <item.icon className="h-4 w-4 shrink-0" />
                   {item.label}
                 </NavLink>
               </li>

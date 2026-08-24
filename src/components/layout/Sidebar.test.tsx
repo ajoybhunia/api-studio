@@ -81,9 +81,4 @@ describe("Sidebar", () => {
     renderSidebar();
     expect(screen.getByText("API Studio")).toBeInTheDocument();
   });
-
-  it("renders Workspace label", () => {
-    renderSidebar();
-    expect(screen.getByText("Workspace")).toBeInTheDocument();
-  });
 });
