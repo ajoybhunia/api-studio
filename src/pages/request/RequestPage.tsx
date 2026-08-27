@@ -2,10 +2,34 @@ import { useCallback, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/Button";
 import { useRequestStore } from "./requestStore";
+import type { RequestData } from "./requestStore";
 import { useResponseStore } from "@/stores/responseStore";
 import { RequestBar } from "./components/RequestBar";
 import { RequestEditor } from "./components/RequestEditor";
 import { ResponsePanel } from "./components/ResponsePanel";
+
+function buildQueryString(queryParams: RequestData["queryParams"]): string {
+  return queryParams
+    .filter((p) => p.enabled && p.key.trim())
+    .map((p) => `${encodeURIComponent(p.key)}=${encodeURIComponent(p.value)}`)
+    .join("&");
+}
+
+function PreviewUrl({ request }: { request: RequestData }) {
+  const queryString = buildQueryString(request.queryParams);
+
+  if (!queryString || !request.url.trim()) return null;
+
+  const separator = request.url.includes("?") ? "&" : "?";
+  const previewUrl = `${request.url}${separator}${queryString}`;
+
+  return (
+    <div className="flex items-center gap-2 border-b border-border px-2 py-1 text-xs text-muted-foreground">
+      <span className="shrink-0 font-medium">Preview:</span>
+      <span className="truncate font-mono">{previewUrl}</span>
+    </div>
+  );
+}
 
 export function RequestPage() {
   const { id } = useParams<{ id: string }>();
@@ -32,16 +56,9 @@ export function RequestPage() {
   const handleSend = useCallback(() => {
     if (!request || isJsonBodyInvalid) return;
 
-    const enabledParams = request.queryParams.filter(
-      (p) => p.enabled && p.key.trim(),
-    );
+    const queryString = buildQueryString(request.queryParams);
     let finalUrl = request.url;
-    if (enabledParams.length > 0) {
-      const queryString = enabledParams
-        .map(
-          (p) => `${encodeURIComponent(p.key)}=${encodeURIComponent(p.value)}`,
-        )
-        .join("&");
+    if (queryString) {
       const separator = finalUrl.includes("?") ? "&" : "?";
       finalUrl = `${finalUrl}${separator}${queryString}`;
     }
@@ -101,6 +118,7 @@ export function RequestPage() {
         onSend={handleSend}
         onUpdate={(updates) => updateRequest(id, updates)}
       />
+      <PreviewUrl request={request} />
       <div className="h-72 shrink-0 overflow-auto border-b border-border">
         <RequestEditor
           request={request}

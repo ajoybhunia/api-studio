@@ -121,6 +121,62 @@ test.describe("Query Params", () => {
     await page.getByRole("button", { name: "Send" }).click();
     await expect(page.getByText("200")).toBeVisible();
   });
+
+  test("shows preview URL when params are added", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("button", { name: "New Request" }).click();
+    await page
+      .getByPlaceholder("Enter request URL")
+      .fill("https://api.example.com/users");
+
+    await expect(page.getByText("Preview:")).not.toBeVisible();
+
+    await page.getByRole("button", { name: "Params" }).click();
+    await page.getByText("+ Add param").click();
+    await page.getByPlaceholder("Key").fill("page");
+    await page.getByPlaceholder("Value").fill("1");
+
+    await expect(page.getByText("Preview:")).toBeVisible();
+    await expect(
+      page.getByText("https://api.example.com/users?page=1"),
+    ).toBeVisible();
+
+    await page.getByText("+ Add param").click();
+    const keyInputs = page.getByPlaceholder("Key");
+    const valueInputs = page.getByPlaceholder("Value");
+    await keyInputs.nth(1).fill("limit");
+    await valueInputs.nth(1).fill("10");
+
+    await expect(page.getByText(/page=1&limit=10/)).toBeVisible();
+  });
+
+  test("excludes disabled params from preview URL", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("button", { name: "New Request" }).click();
+    await page
+      .getByPlaceholder("Enter request URL")
+      .fill("https://api.example.com");
+
+    await page.getByRole("button", { name: "Params" }).click();
+
+    await page.getByText("+ Add param").click();
+    await page.getByPlaceholder("Key").fill("page");
+    await page.getByPlaceholder("Value").fill("1");
+
+    await page.getByText("+ Add param").click();
+    const keyInputs = page.getByPlaceholder("Key");
+    const valueInputs = page.getByPlaceholder("Value");
+    await keyInputs.nth(1).fill("debug");
+    await valueInputs.nth(1).fill("true");
+
+    const checkboxes = page.locator("input[type='checkbox']");
+    await checkboxes.nth(1).uncheck();
+
+    await expect(
+      page.getByText("https://api.example.com?page=1"),
+    ).toBeVisible();
+    await expect(page.getByText(/debug/)).not.toBeVisible();
+  });
 });
 
 test.describe("Headers Editor", () => {

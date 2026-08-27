@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { RequestPage } from "./RequestPage";
 import { useRequestStore } from "./requestStore";
@@ -218,5 +218,86 @@ describe("RequestPage", () => {
     fireEvent.keyDown(window, { key: "Enter", ctrlKey: true });
     expect(sendRequestSpy).not.toHaveBeenCalled();
     sendRequestSpy.mockRestore();
+  });
+
+  it("hides preview URL when no params", () => {
+    const id = useRequestStore.getState().createRequest();
+    useRequestStore
+      .getState()
+      .updateRequest(id, { url: "https://api.example.com" });
+    renderWithRouter(<RequestPage />, `/request/${id}`);
+    expect(screen.queryByText("Preview:")).not.toBeInTheDocument();
+  });
+
+  it("shows preview URL when params exist", () => {
+    const id = useRequestStore.getState().createRequest();
+    useRequestStore
+      .getState()
+      .updateRequest(id, { url: "https://api.example.com/users" });
+    useRequestStore.getState().updateRequest(id, {
+      queryParams: [{ id: "p1", key: "page", value: "1", enabled: true }],
+    });
+    renderWithRouter(<RequestPage />, `/request/${id}`);
+    expect(screen.getByText("Preview:")).toBeInTheDocument();
+    expect(
+      screen.getByText("https://api.example.com/users?page=1"),
+    ).toBeInTheDocument();
+  });
+
+  it("hides preview URL when URL is empty", () => {
+    const id = useRequestStore.getState().createRequest();
+    useRequestStore.getState().updateRequest(id, {
+      queryParams: [{ id: "p1", key: "page", value: "1", enabled: true }],
+    });
+    renderWithRouter(<RequestPage />, `/request/${id}`);
+    expect(screen.queryByText("Preview:")).not.toBeInTheDocument();
+  });
+
+  it("excludes disabled params from preview URL", () => {
+    const id = useRequestStore.getState().createRequest();
+    useRequestStore
+      .getState()
+      .updateRequest(id, { url: "https://api.example.com" });
+    useRequestStore.getState().updateRequest(id, {
+      queryParams: [
+        { id: "p1", key: "page", value: "1", enabled: true },
+        { id: "p2", key: "debug", value: "true", enabled: false },
+      ],
+    });
+    renderWithRouter(<RequestPage />, `/request/${id}`);
+    expect(
+      screen.getByText("https://api.example.com?page=1"),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/debug/)).not.toBeInTheDocument();
+  });
+
+  it("updates preview URL when params change", () => {
+    const id = useRequestStore.getState().createRequest();
+    act(() => {
+      useRequestStore
+        .getState()
+        .updateRequest(id, { url: "https://api.example.com" });
+      useRequestStore.getState().updateRequest(id, {
+        queryParams: [{ id: "p1", key: "page", value: "1", enabled: true }],
+      });
+    });
+    renderWithRouter(<RequestPage />, `/request/${id}`);
+    expect(
+      screen.getByText("https://api.example.com?page=1"),
+    ).toBeInTheDocument();
+
+    act(() => {
+      useRequestStore.getState().updateRequest(id, {
+        queryParams: [
+          { id: "p1", key: "page", value: "2", enabled: true },
+          { id: "p2", key: "limit", value: "20", enabled: true },
+        ],
+      });
+    });
+    expect(
+      screen.getByText(
+        (content) => content.includes("page=2") && content.includes("limit=20"),
+      ),
+    ).toBeInTheDocument();
   });
 });
