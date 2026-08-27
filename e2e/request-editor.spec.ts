@@ -57,7 +57,7 @@ test.describe("Sidebar Request List", () => {
     await page.goto("/");
     await page.getByTitle("New Request").click();
     await expect(page.getByRole("button", { name: "GET" })).toBeVisible();
-    await expect(page.getByText("GET Untitled")).toBeVisible();
+    await expect(page.getByText("Untitled")).toBeVisible();
   });
 
   test("shows request in sidebar after creation", async ({ page }) => {
@@ -66,7 +66,7 @@ test.describe("Sidebar Request List", () => {
     await page
       .getByPlaceholder("Enter request URL")
       .fill("https://api.example.com/users");
-    await expect(page.getByText("GET /users")).toBeVisible();
+    await expect(page.getByText("/users")).toBeVisible();
   });
 
   test("switches between requests via sidebar", async ({ page }) => {
@@ -82,7 +82,7 @@ test.describe("Sidebar Request List", () => {
       .fill("https://api.example.com/posts");
 
     const sidebar = page.locator("aside");
-    await sidebar.getByText("GET /users").click();
+    await sidebar.getByText("/users").click();
     const input = page.getByPlaceholder("Enter request URL");
     await expect(input).toHaveValue("https://api.example.com/users");
   });
@@ -90,13 +90,13 @@ test.describe("Sidebar Request List", () => {
   test("deletes request from sidebar", async ({ page }) => {
     await page.goto("/");
     await page.getByRole("button", { name: "New Request" }).click();
-    await expect(page.getByText("GET Untitled")).toBeVisible();
+    await expect(page.getByText("Untitled")).toBeVisible();
 
-    const requestItem = page.locator("li").filter({ hasText: "GET Untitled" });
+    const requestItem = page.locator("li").filter({ hasText: "Untitled" });
     await requestItem.hover();
     await requestItem.getByTitle("Delete request").click({ force: true });
 
-    await expect(page.getByText("GET Untitled")).not.toBeVisible();
+    await expect(page.getByText("Untitled")).not.toBeVisible();
   });
 });
 

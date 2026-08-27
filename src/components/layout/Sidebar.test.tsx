@@ -54,8 +54,8 @@ describe("Sidebar", () => {
       .getState()
       .updateRequest(id2, { url: "https://b.com/posts" });
     renderSidebar();
-    expect(screen.getByText("GET /users")).toBeInTheDocument();
-    expect(screen.getByText("GET /posts")).toBeInTheDocument();
+    expect(screen.getByText("/users")).toBeInTheDocument();
+    expect(screen.getByText("/posts")).toBeInTheDocument();
   });
 
   it("deletes request on x click", () => {

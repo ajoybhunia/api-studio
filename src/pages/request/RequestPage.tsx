@@ -79,6 +79,8 @@ export function RequestPage() {
 
     if (request.body.type === "json" && !headers["Content-Type"]) {
       headers["Content-Type"] = "application/json";
+    } else if (request.body.type === "raw" && !headers["Content-Type"]) {
+      headers["Content-Type"] = "text/plain";
     }
 
     const body =

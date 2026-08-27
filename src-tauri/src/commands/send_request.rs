@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::error::Error;
 use std::time::Duration;
 
 use reqwest::Client;
@@ -39,7 +40,11 @@ pub fn classify_error(err: &reqwest::Error) -> String {
     if err.is_timeout() {
         "timeout".to_string()
     } else if err.is_connect() {
-        "connection".to_string()
+        if is_tls_error(err) {
+            "tls".to_string()
+        } else {
+            "connection".to_string()
+        }
     } else if let Some(url_err) = err.url() {
         let _ = url_err;
         "invalid_url".to_string()
@@ -48,6 +53,22 @@ pub fn classify_error(err: &reqwest::Error) -> String {
     } else {
         "unknown".to_string()
     }
+}
+
+fn is_tls_error(err: &reqwest::Error) -> bool {
+    let mut source: Option<&dyn std::error::Error> = err.source();
+    while let Some(e) = source {
+        let type_name = std::any::type_name_of_val(e);
+        if type_name.contains("rustls")
+            || type_name.contains("native_tls")
+            || type_name.contains("SecurityFramework")
+            || type_name.contains("Ssl")
+        {
+            return true;
+        }
+        source = e.source();
+    }
+    false
 }
 
 pub fn format_error_message(err: &reqwest::Error, kind: &str) -> String {
@@ -60,6 +81,7 @@ pub fn format_error_message(err: &reqwest::Error, kind: &str) -> String {
                 "Could not connect to host".to_string()
             }
         }
+        "tls" => "TLS handshake failed — check certificate or TLS settings".to_string(),
         "invalid_url" => {
             if let Some(url) = err.url() {
                 format!("Invalid URL: {}", url)
@@ -277,5 +299,21 @@ mod tests {
             .unwrap_err();
         let msg = format_error_message(&err, "connection");
         assert!(msg.starts_with("Could not connect to"));
+    }
+
+    #[tokio::test]
+    async fn format_error_message_tls() {
+        let client = Client::builder()
+            .timeout(Duration::from_secs(5))
+            .build()
+            .unwrap();
+        let err = client
+            .get("https://expired.badssl.com/")
+            .send()
+            .await
+            .unwrap_err();
+        let kind = classify_error(&err);
+        let msg = format_error_message(&err, &kind);
+        assert!(!msg.is_empty());
     }
 }

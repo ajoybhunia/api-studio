@@ -300,4 +300,73 @@ describe("RequestPage", () => {
       ),
     ).toBeInTheDocument();
   });
+
+  it("auto-sets Content-Type application/json for json body", () => {
+    const id = useRequestStore.getState().createRequest();
+    useRequestStore
+      .getState()
+      .updateRequest(id, { url: "https://api.example.com" });
+    useRequestStore.getState().updateRequest(id, {
+      body: { type: "json", content: '{"key":"value"}' },
+    });
+    const sendRequestSpy = vi
+      .spyOn(useResponseStore.getState(), "sendRequest")
+      .mockImplementation(() => Promise.resolve());
+    renderWithRouter(<RequestPage />, `/request/${id}`);
+    fireEvent.keyDown(window, { key: "Enter", ctrlKey: true });
+    expect(sendRequestSpy).toHaveBeenCalledWith(id, {
+      method: "GET",
+      url: "https://api.example.com",
+      headers: { "Content-Type": "application/json" },
+      body: '{"key":"value"}',
+    });
+    sendRequestSpy.mockRestore();
+  });
+
+  it("auto-sets Content-Type text/plain for raw body", () => {
+    const id = useRequestStore.getState().createRequest();
+    useRequestStore
+      .getState()
+      .updateRequest(id, { url: "https://api.example.com" });
+    useRequestStore.getState().updateRequest(id, {
+      body: { type: "raw", content: "hello world" },
+    });
+    const sendRequestSpy = vi
+      .spyOn(useResponseStore.getState(), "sendRequest")
+      .mockImplementation(() => Promise.resolve());
+    renderWithRouter(<RequestPage />, `/request/${id}`);
+    fireEvent.keyDown(window, { key: "Enter", ctrlKey: true });
+    expect(sendRequestSpy).toHaveBeenCalledWith(id, {
+      method: "GET",
+      url: "https://api.example.com",
+      headers: { "Content-Type": "text/plain" },
+      body: "hello world",
+    });
+    sendRequestSpy.mockRestore();
+  });
+
+  it("preserves manual Content-Type override for raw body", () => {
+    const id = useRequestStore.getState().createRequest();
+    useRequestStore
+      .getState()
+      .updateRequest(id, { url: "https://api.example.com" });
+    useRequestStore.getState().updateRequest(id, {
+      body: { type: "raw", content: "hello world" },
+      headers: [
+        { id: "h1", key: "Content-Type", value: "text/html", enabled: true },
+      ],
+    });
+    const sendRequestSpy = vi
+      .spyOn(useResponseStore.getState(), "sendRequest")
+      .mockImplementation(() => Promise.resolve());
+    renderWithRouter(<RequestPage />, `/request/${id}`);
+    fireEvent.keyDown(window, { key: "Enter", ctrlKey: true });
+    expect(sendRequestSpy).toHaveBeenCalledWith(id, {
+      method: "GET",
+      url: "https://api.example.com",
+      headers: { "Content-Type": "text/html" },
+      body: "hello world",
+    });
+    sendRequestSpy.mockRestore();
+  });
 });

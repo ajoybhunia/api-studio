@@ -59,15 +59,13 @@ interface RequestState {
   deleteRequest: (id: string) => void;
 }
 
-export function buildRequestName(method: string, url: string): string {
-  if (!url.trim()) return `${method} Untitled`;
+export function buildRequestName(_method: string, url: string): string {
+  if (!url.trim()) return "Untitled";
   try {
     const parsed = new URL(url);
-    const path = parsed.pathname === "/" ? "/" : parsed.pathname;
-    return `${method} ${path}`;
+    return parsed.pathname === "/" ? "/" : parsed.pathname;
   } catch {
-    const path = url.split("?")[0];
-    return `${method} ${path || "Untitled"}`;
+    return url.split("?")[0] || "Untitled";
   }
 }
 
@@ -98,7 +96,7 @@ export const useRequestStore = create<RequestState>((set, get) => ({
     const id = crypto.randomUUID();
     const request: RequestData = {
       id,
-      name: "GET Untitled",
+      name: "Untitled",
       method: "GET",
       url: "",
       headers: [],

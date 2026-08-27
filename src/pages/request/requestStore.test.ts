@@ -25,7 +25,7 @@ describe("useRequestStore", () => {
       expect(request).toBeDefined();
       expect(request.method).toBe("GET");
       expect(request.url).toBe("");
-      expect(request.name).toBe("GET Untitled");
+      expect(request.name).toBe("Untitled");
       expect(request.headers).toEqual([]);
       expect(request.queryParams).toEqual([]);
       expect(request.auth).toEqual({
@@ -77,7 +77,7 @@ describe("useRequestStore", () => {
         .getState()
         .updateRequest(id, { url: "https://api.example.com/users" });
       const request = useRequestStore.getState().requests[id];
-      expect(request.name).toBe("GET /users");
+      expect(request.name).toBe("/users");
     });
 
     it("auto-updates name when method changes", () => {
@@ -87,7 +87,7 @@ describe("useRequestStore", () => {
         .updateRequest(id, { url: "https://api.example.com/users" });
       useRequestStore.getState().updateRequest(id, { method: "POST" });
       const request = useRequestStore.getState().requests[id];
-      expect(request.name).toBe("POST /users");
+      expect(request.name).toBe("/users");
     });
 
     it("updates tab title when name changes", () => {
@@ -96,7 +96,7 @@ describe("useRequestStore", () => {
         .getState()
         .updateRequest(id, { url: "https://api.example.com/posts" });
       const tab = useRequestStore.getState().openTabs.find((t) => t.id === id);
-      expect(tab?.title).toBe("GET /posts");
+      expect(tab?.title).toBe("/posts");
     });
   });
 
@@ -143,31 +143,31 @@ describe("useRequestStore", () => {
 });
 
 describe("buildRequestName", () => {
-  it("returns method + Untitled when url is empty", () => {
-    expect(buildRequestName("GET", "")).toBe("GET Untitled");
+  it("returns Untitled when url is empty", () => {
+    expect(buildRequestName("GET", "")).toBe("Untitled");
   });
 
-  it("returns method + path for valid url", () => {
+  it("returns path for valid url", () => {
     expect(buildRequestName("GET", "https://api.example.com/users")).toBe(
-      "GET /users",
+      "/users",
     );
   });
 
   it("returns root path for base url", () => {
-    expect(buildRequestName("POST", "https://api.example.com")).toBe("POST /");
+    expect(buildRequestName("POST", "https://api.example.com")).toBe("/");
   });
 
   it("strips query string from path", () => {
     expect(
       buildRequestName("GET", "https://api.example.com/users?page=1"),
-    ).toBe("GET /users");
+    ).toBe("/users");
   });
 
   it("handles invalid url as path", () => {
-    expect(buildRequestName("GET", "/api/users")).toBe("GET /api/users");
+    expect(buildRequestName("GET", "/api/users")).toBe("/api/users");
   });
 
-  it("handles url with only method and no path", () => {
-    expect(buildRequestName("DELETE", "")).toBe("DELETE Untitled");
+  it("returns Untitled when url is empty regardless of method", () => {
+    expect(buildRequestName("DELETE", "")).toBe("Untitled");
   });
 });
