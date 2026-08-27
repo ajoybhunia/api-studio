@@ -1,8 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { RequestPage } from "./RequestPage";
 import { useRequestStore } from "./requestStore";
+import { useResponseStore } from "@/stores/responseStore";
 
 function renderWithRouter(ui: React.ReactElement, route = "/") {
   return render(
@@ -22,6 +23,7 @@ describe("RequestPage", () => {
       activeTabId: null,
       requests: {},
     });
+    useResponseStore.setState({ responses: {} });
   });
 
   it("shows empty state when no request ID matches", () => {
@@ -101,18 +103,270 @@ describe("RequestPage", () => {
     expect(ids).toHaveLength(1);
   });
 
+  it("renders editor tabs", () => {
+    const id = useRequestStore.getState().createRequest();
+    renderWithRouter(<RequestPage />, `/request/${id}`);
+    expect(screen.getByRole("button", { name: "Params" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Body" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Auth" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Headers" })).toBeInTheDocument();
+  });
+
   it("triggers onSend on Ctrl+Enter", () => {
     const id = useRequestStore.getState().createRequest();
     useRequestStore
       .getState()
       .updateRequest(id, { url: "https://api.example.com" });
-    const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+    const sendRequestSpy = vi
+      .spyOn(useResponseStore.getState(), "sendRequest")
+      .mockImplementation(() => Promise.resolve());
     renderWithRouter(<RequestPage />, `/request/${id}`);
     fireEvent.keyDown(window, { key: "Enter", ctrlKey: true });
-    expect(consoleSpy).toHaveBeenCalledWith("Send request:", {
+    expect(sendRequestSpy).toHaveBeenCalledWith(id, {
       method: "GET",
       url: "https://api.example.com",
+      headers: undefined,
+      body: undefined,
     });
-    consoleSpy.mockRestore();
+    sendRequestSpy.mockRestore();
+  });
+
+  it("sends request with query params merged into url", () => {
+    const id = useRequestStore.getState().createRequest();
+    useRequestStore
+      .getState()
+      .updateRequest(id, { url: "https://api.example.com/users" });
+    useRequestStore.getState().updateRequest(id, {
+      queryParams: [
+        { id: "p1", key: "page", value: "1", enabled: true },
+        { id: "p2", key: "limit", value: "10", enabled: true },
+      ],
+    });
+    const sendRequestSpy = vi
+      .spyOn(useResponseStore.getState(), "sendRequest")
+      .mockImplementation(() => Promise.resolve());
+    renderWithRouter(<RequestPage />, `/request/${id}`);
+    fireEvent.keyDown(window, { key: "Enter", ctrlKey: true });
+    expect(sendRequestSpy).toHaveBeenCalledWith(id, {
+      method: "GET",
+      url: "https://api.example.com/users?page=1&limit=10",
+      headers: undefined,
+      body: undefined,
+    });
+    sendRequestSpy.mockRestore();
+  });
+
+  it("sends request with enabled headers", () => {
+    const id = useRequestStore.getState().createRequest();
+    useRequestStore
+      .getState()
+      .updateRequest(id, { url: "https://api.example.com" });
+    useRequestStore.getState().updateRequest(id, {
+      headers: [
+        { id: "h1", key: "X-Custom", value: "test", enabled: true },
+        { id: "h2", key: "X-Disabled", value: "no", enabled: false },
+      ],
+    });
+    const sendRequestSpy = vi
+      .spyOn(useResponseStore.getState(), "sendRequest")
+      .mockImplementation(() => Promise.resolve());
+    renderWithRouter(<RequestPage />, `/request/${id}`);
+    fireEvent.keyDown(window, { key: "Enter", ctrlKey: true });
+    expect(sendRequestSpy).toHaveBeenCalledWith(id, {
+      method: "GET",
+      url: "https://api.example.com",
+      headers: { "X-Custom": "test" },
+      body: undefined,
+    });
+    sendRequestSpy.mockRestore();
+  });
+
+  it("sends request with bearer auth header", () => {
+    const id = useRequestStore.getState().createRequest();
+    useRequestStore
+      .getState()
+      .updateRequest(id, { url: "https://api.example.com" });
+    useRequestStore.getState().updateRequest(id, {
+      auth: { type: "bearer", token: "abc123", username: "", password: "" },
+    });
+    const sendRequestSpy = vi
+      .spyOn(useResponseStore.getState(), "sendRequest")
+      .mockImplementation(() => Promise.resolve());
+    renderWithRouter(<RequestPage />, `/request/${id}`);
+    fireEvent.keyDown(window, { key: "Enter", ctrlKey: true });
+    expect(sendRequestSpy).toHaveBeenCalledWith(id, {
+      method: "GET",
+      url: "https://api.example.com",
+      headers: { Authorization: "Bearer abc123" },
+      body: undefined,
+    });
+    sendRequestSpy.mockRestore();
+  });
+
+  it("blocks send when json body is invalid", () => {
+    const id = useRequestStore.getState().createRequest();
+    useRequestStore
+      .getState()
+      .updateRequest(id, { url: "https://api.example.com" });
+    useRequestStore.getState().updateRequest(id, {
+      body: { type: "json", content: "{ invalid }" },
+    });
+    const sendRequestSpy = vi
+      .spyOn(useResponseStore.getState(), "sendRequest")
+      .mockImplementation(() => Promise.resolve());
+    renderWithRouter(<RequestPage />, `/request/${id}`);
+    fireEvent.keyDown(window, { key: "Enter", ctrlKey: true });
+    expect(sendRequestSpy).not.toHaveBeenCalled();
+    sendRequestSpy.mockRestore();
+  });
+
+  it("hides preview URL when no params", () => {
+    const id = useRequestStore.getState().createRequest();
+    useRequestStore
+      .getState()
+      .updateRequest(id, { url: "https://api.example.com" });
+    renderWithRouter(<RequestPage />, `/request/${id}`);
+    expect(screen.queryByText("Preview:")).not.toBeInTheDocument();
+  });
+
+  it("shows preview URL when params exist", () => {
+    const id = useRequestStore.getState().createRequest();
+    useRequestStore
+      .getState()
+      .updateRequest(id, { url: "https://api.example.com/users" });
+    useRequestStore.getState().updateRequest(id, {
+      queryParams: [{ id: "p1", key: "page", value: "1", enabled: true }],
+    });
+    renderWithRouter(<RequestPage />, `/request/${id}`);
+    expect(screen.getByText("Preview:")).toBeInTheDocument();
+    expect(
+      screen.getByText("https://api.example.com/users?page=1"),
+    ).toBeInTheDocument();
+  });
+
+  it("hides preview URL when URL is empty", () => {
+    const id = useRequestStore.getState().createRequest();
+    useRequestStore.getState().updateRequest(id, {
+      queryParams: [{ id: "p1", key: "page", value: "1", enabled: true }],
+    });
+    renderWithRouter(<RequestPage />, `/request/${id}`);
+    expect(screen.queryByText("Preview:")).not.toBeInTheDocument();
+  });
+
+  it("excludes disabled params from preview URL", () => {
+    const id = useRequestStore.getState().createRequest();
+    useRequestStore
+      .getState()
+      .updateRequest(id, { url: "https://api.example.com" });
+    useRequestStore.getState().updateRequest(id, {
+      queryParams: [
+        { id: "p1", key: "page", value: "1", enabled: true },
+        { id: "p2", key: "debug", value: "true", enabled: false },
+      ],
+    });
+    renderWithRouter(<RequestPage />, `/request/${id}`);
+    expect(
+      screen.getByText("https://api.example.com?page=1"),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/debug/)).not.toBeInTheDocument();
+  });
+
+  it("updates preview URL when params change", () => {
+    const id = useRequestStore.getState().createRequest();
+    act(() => {
+      useRequestStore
+        .getState()
+        .updateRequest(id, { url: "https://api.example.com" });
+      useRequestStore.getState().updateRequest(id, {
+        queryParams: [{ id: "p1", key: "page", value: "1", enabled: true }],
+      });
+    });
+    renderWithRouter(<RequestPage />, `/request/${id}`);
+    expect(
+      screen.getByText("https://api.example.com?page=1"),
+    ).toBeInTheDocument();
+
+    act(() => {
+      useRequestStore.getState().updateRequest(id, {
+        queryParams: [
+          { id: "p1", key: "page", value: "2", enabled: true },
+          { id: "p2", key: "limit", value: "20", enabled: true },
+        ],
+      });
+    });
+    expect(
+      screen.getByText(
+        (content) => content.includes("page=2") && content.includes("limit=20"),
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("auto-sets Content-Type application/json for json body", () => {
+    const id = useRequestStore.getState().createRequest();
+    useRequestStore
+      .getState()
+      .updateRequest(id, { url: "https://api.example.com" });
+    useRequestStore.getState().updateRequest(id, {
+      body: { type: "json", content: '{"key":"value"}' },
+    });
+    const sendRequestSpy = vi
+      .spyOn(useResponseStore.getState(), "sendRequest")
+      .mockImplementation(() => Promise.resolve());
+    renderWithRouter(<RequestPage />, `/request/${id}`);
+    fireEvent.keyDown(window, { key: "Enter", ctrlKey: true });
+    expect(sendRequestSpy).toHaveBeenCalledWith(id, {
+      method: "GET",
+      url: "https://api.example.com",
+      headers: { "Content-Type": "application/json" },
+      body: '{"key":"value"}',
+    });
+    sendRequestSpy.mockRestore();
+  });
+
+  it("auto-sets Content-Type text/plain for raw body", () => {
+    const id = useRequestStore.getState().createRequest();
+    useRequestStore
+      .getState()
+      .updateRequest(id, { url: "https://api.example.com" });
+    useRequestStore.getState().updateRequest(id, {
+      body: { type: "raw", content: "hello world" },
+    });
+    const sendRequestSpy = vi
+      .spyOn(useResponseStore.getState(), "sendRequest")
+      .mockImplementation(() => Promise.resolve());
+    renderWithRouter(<RequestPage />, `/request/${id}`);
+    fireEvent.keyDown(window, { key: "Enter", ctrlKey: true });
+    expect(sendRequestSpy).toHaveBeenCalledWith(id, {
+      method: "GET",
+      url: "https://api.example.com",
+      headers: { "Content-Type": "text/plain" },
+      body: "hello world",
+    });
+    sendRequestSpy.mockRestore();
+  });
+
+  it("preserves manual Content-Type override for raw body", () => {
+    const id = useRequestStore.getState().createRequest();
+    useRequestStore
+      .getState()
+      .updateRequest(id, { url: "https://api.example.com" });
+    useRequestStore.getState().updateRequest(id, {
+      body: { type: "raw", content: "hello world" },
+      headers: [
+        { id: "h1", key: "Content-Type", value: "text/html", enabled: true },
+      ],
+    });
+    const sendRequestSpy = vi
+      .spyOn(useResponseStore.getState(), "sendRequest")
+      .mockImplementation(() => Promise.resolve());
+    renderWithRouter(<RequestPage />, `/request/${id}`);
+    fireEvent.keyDown(window, { key: "Enter", ctrlKey: true });
+    expect(sendRequestSpy).toHaveBeenCalledWith(id, {
+      method: "GET",
+      url: "https://api.example.com",
+      headers: { "Content-Type": "text/html" },
+      body: "hello world",
+    });
+    sendRequestSpy.mockRestore();
   });
 });

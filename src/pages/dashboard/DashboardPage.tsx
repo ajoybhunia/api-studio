@@ -1,19 +1,10 @@
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { invoke } from "@tauri-apps/api/core";
 import { Button } from "@/components/ui/Button";
 import { useRequestStore } from "@/pages/request/requestStore";
 
 export function DashboardPage() {
-  const [ping, setPing] = useState<string>("");
   const navigate = useNavigate();
   const createRequest = useRequestStore((s) => s.createRequest);
-
-  useEffect(() => {
-    invoke<string>("greet", { name: "developer" })
-      .then(setPing)
-      .catch(() => setPing("Backend unreachable"));
-  }, []);
 
   const handleNewRequest = () => {
     const id = createRequest();
@@ -29,17 +20,13 @@ export function DashboardPage() {
         </p>
       </div>
 
-      <div className="rounded-md border border-border bg-muted/40 px-4 py-2 text-sm">
-        {ping || "Checking Rust backend..."}
-      </div>
-
       <div className="flex flex-wrap items-center justify-center gap-3">
         <Button onClick={handleNewRequest}>New Request</Button>
         <Button variant="outline">Import Collection</Button>
       </div>
 
       <p className="text-xs text-muted-foreground">
-        Request editor, collections, and history are coming in the next phases.
+        Create a new request to get started.
       </p>
     </div>
   );
