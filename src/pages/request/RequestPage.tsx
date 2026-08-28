@@ -119,6 +119,7 @@ export function RequestPage() {
         request={request}
         onSend={handleSend}
         onUpdate={(updates) => updateRequest(id, updates)}
+        isLoading={responseRecord?.isLoading ?? false}
       />
       <PreviewUrl request={request} />
       <div className="h-72 shrink-0 overflow-auto border-b border-border">
