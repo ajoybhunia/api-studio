@@ -98,4 +98,20 @@ describe("RequestBar", () => {
     fireEvent.keyDown(window, { key: "Enter", ctrlKey: true });
     expect(defaultProps.onSend).not.toHaveBeenCalled();
   });
+
+  it("disables Send when isLoading is true", () => {
+    render(
+      <RequestBar
+        request={makeRequest({ url: "https://example.com" })}
+        {...defaultProps}
+        isLoading
+      />,
+    );
+    const buttons = screen.getAllByRole("button");
+    const sendButton = buttons.find(
+      (b) => b.querySelector(".animate-spin") !== null,
+    );
+    expect(sendButton).toBeDefined();
+    expect(sendButton).toBeDisabled();
+  });
 });
