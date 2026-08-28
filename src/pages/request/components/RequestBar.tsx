@@ -23,7 +23,12 @@ interface RequestBarProps {
   isLoading?: boolean;
 }
 
-export function RequestBar({ request, onSend, onUpdate, isLoading }: RequestBarProps) {
+export function RequestBar({
+  request,
+  onSend,
+  onUpdate,
+  isLoading,
+}: RequestBarProps) {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
@@ -51,7 +56,11 @@ export function RequestBar({ request, onSend, onUpdate, isLoading }: RequestBarP
         className="flex-1"
       />
 
-      <Button onClick={onSend} disabled={!request.url.trim() || isLoading} className="min-w-[5rem]">
+      <Button
+        onClick={onSend}
+        disabled={!request.url.trim() || isLoading}
+        className="min-w-[5rem]"
+      >
         {isLoading ? (
           <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
         ) : (
