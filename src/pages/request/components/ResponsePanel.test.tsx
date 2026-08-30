@@ -72,6 +72,8 @@ describe("ResponsePanel", () => {
         headers: {},
         body: { type: "Text", value: "ok" },
         time_ms: 42,
+        ttfb_ms: 10,
+        size_bytes: 2,
       },
     };
     render(<ResponsePanel record={record} />);
@@ -86,6 +88,8 @@ describe("ResponsePanel", () => {
         headers: {},
         body: { type: "Text", value: "ok" },
         time_ms: 42,
+        ttfb_ms: 10,
+        size_bytes: 2,
       },
     };
     render(<ResponsePanel record={record} />);
@@ -100,6 +104,8 @@ describe("ResponsePanel", () => {
         headers: {},
         body: { type: "Text", value: "error" },
         time_ms: 100,
+        ttfb_ms: 50,
+        size_bytes: 5,
       },
     };
     render(<ResponsePanel record={record} />);
@@ -114,6 +120,8 @@ describe("ResponsePanel", () => {
         headers: {},
         body: { type: "Text", value: "ok" },
         time_ms: 42,
+        ttfb_ms: 10,
+        size_bytes: 2,
       },
     };
     render(<ResponsePanel record={record} />);
@@ -128,6 +136,8 @@ describe("ResponsePanel", () => {
         headers: {},
         body: { type: "Json", value: { name: "test" } },
         time_ms: 10,
+        ttfb_ms: 5,
+        size_bytes: 17,
       },
     };
     render(<ResponsePanel record={record} />);
@@ -142,6 +152,8 @@ describe("ResponsePanel", () => {
         headers: {},
         body: { type: "Text", value: "hello world" },
         time_ms: 10,
+        ttfb_ms: 5,
+        size_bytes: 11,
       },
     };
     render(<ResponsePanel record={record} />);
@@ -156,6 +168,8 @@ describe("ResponsePanel", () => {
         headers: {},
         body: { type: "Empty" },
         time_ms: 5,
+        ttfb_ms: 3,
+        size_bytes: 0,
       },
     };
     render(<ResponsePanel record={record} />);

@@ -20,6 +20,8 @@ pub struct SendResponse {
     pub headers: HashMap<String, String>,
     pub body: ResponseBody,
     pub time_ms: u64,
+    pub ttfb_ms: u64,
+    pub size_bytes: u64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -157,7 +159,7 @@ pub async fn send_request(args: SendRequestArgs) -> Result<SendResponse, Request
         let message = format_error_message(&e, &kind);
         RequestError { kind, message }
     })?;
-    let time_ms = start.elapsed().as_millis() as u64;
+    let ttfb_ms = start.elapsed().as_millis() as u64;
 
     let status = response.status().as_u16();
     let headers = parse_headers(response.headers());
@@ -166,6 +168,8 @@ pub async fn send_request(args: SendRequestArgs) -> Result<SendResponse, Request
         kind: "unknown".to_string(),
         message: format!("Failed to read response body: {}", e),
     })?;
+    let time_ms = start.elapsed().as_millis() as u64;
+    let size_bytes = body_text.len() as u64;
 
     let body = detect_json(&body_text);
 
@@ -174,6 +178,8 @@ pub async fn send_request(args: SendRequestArgs) -> Result<SendResponse, Request
         headers,
         body,
         time_ms,
+        ttfb_ms,
+        size_bytes,
     })
 }
 
@@ -304,16 +310,18 @@ mod tests {
     #[tokio::test]
     async fn format_error_message_tls() {
         let client = Client::builder()
-            .timeout(Duration::from_secs(5))
+            .timeout(Duration::from_millis(1))
             .build()
             .unwrap();
         let err = client
-            .get("https://expired.badssl.com/")
+            .get("http://127.0.0.1:1")
             .send()
             .await
             .unwrap_err();
-        let kind = classify_error(&err);
-        let msg = format_error_message(&err, &kind);
-        assert!(!msg.is_empty());
+        let msg = format_error_message(&err, "tls");
+        assert_eq!(
+            msg,
+            "TLS handshake failed — check certificate or TLS settings"
+        );
     }
 }
