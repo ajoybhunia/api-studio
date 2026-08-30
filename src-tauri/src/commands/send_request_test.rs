@@ -220,4 +220,58 @@ mod tests {
         let result = send_request(args).await.unwrap();
         assert_eq!(result.status, 404);
     }
+
+    #[tokio::test]
+    async fn send_request_captures_metrics() {
+        let mock_server = MockServer::start().await;
+
+        Mock::given(method("GET"))
+            .and(path("/metrics"))
+            .respond_with(
+                ResponseTemplate::new(200)
+                    .set_body_string("Hello, World!"),
+            )
+            .mount(&mock_server)
+            .await;
+
+        let args = SendRequestArgs {
+            method: "GET".to_string(),
+            url: format!("{}/metrics", mock_server.uri()),
+            headers: None,
+            body: None,
+            timeout_seconds: Some(5),
+        };
+
+        let result = send_request(args).await.unwrap();
+        assert!(result.time_ms >= 0, "time_ms should be non-negative");
+        assert!(result.ttfb_ms >= 0, "ttfb_ms should be non-negative");
+        assert!(result.ttfb_ms <= result.time_ms, "ttfb_ms should be <= time_ms");
+        assert_eq!(result.size_bytes, 13, "size_bytes should match body length");
+    }
+
+    #[tokio::test]
+    async fn send_request_size_matches_body() {
+        let mock_server = MockServer::start().await;
+        let body_content = r#"{"key": "value", "number": 42}"#;
+
+        Mock::given(method("GET"))
+            .and(path("/size"))
+            .respond_with(
+                ResponseTemplate::new(200)
+                    .set_body_string(body_content),
+            )
+            .mount(&mock_server)
+            .await;
+
+        let args = SendRequestArgs {
+            method: "GET".to_string(),
+            url: format!("{}/size", mock_server.uri()),
+            headers: None,
+            body: None,
+            timeout_seconds: Some(5),
+        };
+
+        let result = send_request(args).await.unwrap();
+        assert_eq!(result.size_bytes, body_content.len() as u64);
+    }
 }

@@ -47,6 +47,12 @@ function formatKind(kind: string | undefined): string {
   return (kind ?? "unknown").replace(/_/g, " ");
 }
 
+function formatSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
 export function ResponsePanel({ record, className }: ResponsePanelProps) {
   if (!record) {
     return (
@@ -106,6 +112,12 @@ export function ResponsePanel({ record, className }: ResponsePanelProps) {
           </span>
           <span className="text-xs text-muted-foreground">
             {response.time_ms}ms
+          </span>
+          <span className="text-xs text-muted-foreground">
+            TTFB {response.ttfb_ms}ms
+          </span>
+          <span className="text-xs text-muted-foreground">
+            {formatSize(response.size_bytes)}
           </span>
         </div>
         <div className="flex-1 overflow-auto p-4">
