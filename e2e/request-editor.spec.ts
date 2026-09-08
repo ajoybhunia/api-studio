@@ -326,9 +326,15 @@ test.describe("Response Panel States", () => {
     await page.getByRole("button", { name: "Send" }).click();
 
     await expect(page.getByText("200")).toBeVisible();
-    const responsePanel = page.locator("[class*='flex h-full flex-col']").last();
-    await expect(responsePanel.getByRole("button", { name: "Body" })).toBeVisible();
-    await expect(responsePanel.getByRole("button", { name: "Headers" })).toBeVisible();
+    const responsePanel = page
+      .locator("[class*='flex h-full flex-col']")
+      .last();
+    await expect(
+      responsePanel.getByRole("button", { name: "Body" }),
+    ).toBeVisible();
+    await expect(
+      responsePanel.getByRole("button", { name: "Headers" }),
+    ).toBeVisible();
   });
 
   test("switches to Headers tab and shows response headers", async ({
@@ -344,7 +350,9 @@ test.describe("Response Panel States", () => {
     await page.getByRole("button", { name: "Send" }).click();
 
     await expect(page.getByText("200")).toBeVisible();
-    const responsePanel = page.locator("[class*='flex h-full flex-col']").last();
+    const responsePanel = page
+      .locator("[class*='flex h-full flex-col']")
+      .last();
     await responsePanel.getByRole("button", { name: "Headers" }).click();
 
     await expect(page.getByText("content-type")).toBeVisible();
@@ -416,10 +424,18 @@ test.describe("URL to Params Sync", () => {
       .getByPlaceholder("Enter request URL")
       .fill("https://api.example.com?page=1&limit=10");
 
-    await expect(page.getByRole("textbox", { name: "Key" }).first()).toHaveValue("page", { timeout: 3000 });
-    await expect(page.getByRole("textbox", { name: "Value" }).first()).toHaveValue("1");
-    await expect(page.getByRole("textbox", { name: "Key" }).nth(1)).toHaveValue("limit");
-    await expect(page.getByRole("textbox", { name: "Value" }).nth(1)).toHaveValue("10");
+    await expect(
+      page.getByRole("textbox", { name: "Key" }).first(),
+    ).toHaveValue("page", { timeout: 3000 });
+    await expect(
+      page.getByRole("textbox", { name: "Value" }).first(),
+    ).toHaveValue("1");
+    await expect(page.getByRole("textbox", { name: "Key" }).nth(1)).toHaveValue(
+      "limit",
+    );
+    await expect(
+      page.getByRole("textbox", { name: "Value" }).nth(1),
+    ).toHaveValue("10");
   });
 });
 
@@ -434,8 +450,12 @@ test.describe("User-Agent Header", () => {
 
     await page.getByRole("button", { name: "Headers" }).click();
 
-    await expect(page.getByRole("textbox", { name: "Key" }).first()).toHaveValue("User-Agent");
-    await expect(page.getByRole("textbox", { name: "Value" }).first()).toHaveValue("api-studio/1.1.0");
+    await expect(
+      page.getByRole("textbox", { name: "Key" }).first(),
+    ).toHaveValue("User-Agent");
+    await expect(
+      page.getByRole("textbox", { name: "Value" }).first(),
+    ).toHaveValue("api-studio/1.1.0");
   });
 
   test("User-Agent inputs are disabled", async ({ page }) => {
@@ -473,8 +493,13 @@ test.describe("User-Agent Header", () => {
 
     await page.getByRole("button", { name: "Headers" }).click();
 
-    const headersSection = page.locator("div").filter({ hasText: /^User-Agent/ }).first();
-    const deleteButtons = headersSection.locator("button").filter({ hasText: "×" });
+    const headersSection = page
+      .locator("div")
+      .filter({ hasText: /^User-Agent/ })
+      .first();
+    const deleteButtons = headersSection
+      .locator("button")
+      .filter({ hasText: "×" });
     await expect(deleteButtons).toHaveCount(0);
   });
 });
