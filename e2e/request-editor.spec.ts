@@ -194,11 +194,11 @@ test.describe("Headers Editor", () => {
     await page.getByRole("button", { name: "Headers" }).click();
     await page.getByText("+ Add header").click();
 
-    await page.getByPlaceholder("Key").fill("X-Custom");
-    await page.getByPlaceholder("Value").fill("test-value");
+    await page.getByPlaceholder("Key").last().fill("X-Custom");
+    await page.getByPlaceholder("Value").last().fill("test-value");
 
-    const keyInput = page.getByPlaceholder("Key");
-    const valueInput = page.getByPlaceholder("Value");
+    const keyInput = page.getByPlaceholder("Key").last();
+    const valueInput = page.getByPlaceholder("Value").last();
     await expect(keyInput).toHaveValue("X-Custom");
     await expect(valueInput).toHaveValue("test-value");
   });
@@ -313,5 +313,168 @@ test.describe("Response Panel States", () => {
 
     await expect(page.getByText("timeout")).toBeVisible();
     await expect(page.getByText("Request timed out")).toBeVisible();
+  });
+
+  test("shows Body and Headers tabs after response", async ({ page }) => {
+    await page.addInitScript({ content: tauriMockScript(version) });
+    await page.goto("/");
+    await page.getByRole("button", { name: "New Request" }).click();
+
+    await page
+      .getByPlaceholder("Enter request URL")
+      .fill("https://api.example.com");
+    await page.getByRole("button", { name: "Send" }).click();
+
+    await expect(page.getByText("200")).toBeVisible();
+    const responsePanel = page.locator("[class*='flex h-full flex-col']").last();
+    await expect(responsePanel.getByRole("button", { name: "Body" })).toBeVisible();
+    await expect(responsePanel.getByRole("button", { name: "Headers" })).toBeVisible();
+  });
+
+  test("switches to Headers tab and shows response headers", async ({
+    page,
+  }) => {
+    await page.addInitScript({ content: tauriMockScript(version) });
+    await page.goto("/");
+    await page.getByRole("button", { name: "New Request" }).click();
+
+    await page
+      .getByPlaceholder("Enter request URL")
+      .fill("https://api.example.com");
+    await page.getByRole("button", { name: "Send" }).click();
+
+    await expect(page.getByText("200")).toBeVisible();
+    const responsePanel = page.locator("[class*='flex h-full flex-col']").last();
+    await responsePanel.getByRole("button", { name: "Headers" }).click();
+
+    await expect(page.getByText("content-type")).toBeVisible();
+    await expect(page.getByText("text/plain")).toBeVisible();
+    await expect(page.getByText("x-request-id")).toBeVisible();
+  });
+
+  test("shows syntax-highlighted JSON in pretty mode", async ({ page }) => {
+    await page.addInitScript({ content: tauriMockScript(version) });
+    await page.goto("/");
+    await page.getByRole("button", { name: "New Request" }).click();
+
+    await page
+      .getByPlaceholder("Enter request URL")
+      .fill("https://api.example.com/json");
+    await page.getByRole("button", { name: "Send" }).click();
+
+    await expect(page.getByText("200")).toBeVisible();
+    await expect(page.getByText("name")).toBeVisible();
+    await expect(page.getByText("test")).toBeVisible();
+  });
+
+  test("raw/pretty toggle switches display", async ({ page }) => {
+    await page.addInitScript({ content: tauriMockScript(version) });
+    await page.goto("/");
+    await page.getByRole("button", { name: "New Request" }).click();
+
+    await page
+      .getByPlaceholder("Enter request URL")
+      .fill("https://api.example.com/json");
+    await page.getByRole("button", { name: "Send" }).click();
+
+    await expect(page.getByText("200")).toBeVisible();
+    const checkbox = page.getByRole("checkbox").last();
+    await expect(checkbox).toBeChecked();
+
+    await checkbox.uncheck();
+    await expect(checkbox).not.toBeChecked();
+  });
+
+  test("shows context-aware empty body message for 204", async ({ page }) => {
+    await page.addInitScript({ content: tauriMockScript(version) });
+    await page.goto("/");
+    await page.getByRole("button", { name: "New Request" }).click();
+
+    await page
+      .getByPlaceholder("Enter request URL")
+      .fill("https://api.example.com/no-content");
+    await page.getByRole("button", { name: "Send" }).click();
+
+    await expect(page.getByText("204", { exact: true })).toBeVisible();
+    await expect(
+      page.getByText("204 No Content — no body expected"),
+    ).toBeVisible();
+  });
+});
+
+test.describe("URL to Params Sync", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript({ content: tauriMockScript(version) });
+  });
+
+  test("syncs URL query params to params rows", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("button", { name: "New Request" }).click();
+
+    await page.getByRole("button", { name: "Params" }).click();
+    await page
+      .getByPlaceholder("Enter request URL")
+      .fill("https://api.example.com?page=1&limit=10");
+
+    await expect(page.getByRole("textbox", { name: "Key" }).first()).toHaveValue("page", { timeout: 3000 });
+    await expect(page.getByRole("textbox", { name: "Value" }).first()).toHaveValue("1");
+    await expect(page.getByRole("textbox", { name: "Key" }).nth(1)).toHaveValue("limit");
+    await expect(page.getByRole("textbox", { name: "Value" }).nth(1)).toHaveValue("10");
+  });
+});
+
+test.describe("User-Agent Header", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript({ content: tauriMockScript(version) });
+  });
+
+  test("shows locked User-Agent row in headers editor", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("button", { name: "New Request" }).click();
+
+    await page.getByRole("button", { name: "Headers" }).click();
+
+    await expect(page.getByRole("textbox", { name: "Key" }).first()).toHaveValue("User-Agent");
+    await expect(page.getByRole("textbox", { name: "Value" }).first()).toHaveValue("api-studio/1.1.0");
+  });
+
+  test("User-Agent inputs are disabled", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("button", { name: "New Request" }).click();
+
+    await page.getByRole("button", { name: "Headers" }).click();
+
+    const keyInput = page.getByRole("textbox", { name: "Key" }).first();
+    const valueInput = page.getByRole("textbox", { name: "Value" }).first();
+    await expect(keyInput).toBeDisabled();
+    await expect(valueInput).toBeDisabled();
+  });
+
+  test("can toggle User-Agent enabled state", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("button", { name: "New Request" }).click();
+
+    await page.getByRole("button", { name: "Headers" }).click();
+
+    const checkboxes = page.locator("input[type='checkbox']");
+    const userAgentCheckbox = checkboxes.first();
+    await expect(userAgentCheckbox).toBeChecked();
+
+    await userAgentCheckbox.uncheck();
+    await expect(userAgentCheckbox).not.toBeChecked();
+
+    await userAgentCheckbox.check();
+    await expect(userAgentCheckbox).toBeChecked();
+  });
+
+  test("no delete button for User-Agent row", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("button", { name: "New Request" }).click();
+
+    await page.getByRole("button", { name: "Headers" }).click();
+
+    const headersSection = page.locator("div").filter({ hasText: /^User-Agent/ }).first();
+    const deleteButtons = headersSection.locator("button").filter({ hasText: "×" });
+    await expect(deleteButtons).toHaveCount(0);
   });
 });
