@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { version } from "../../../package.json";
 
 export type HttpMethod =
   "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "HEAD" | "OPTIONS";
@@ -10,6 +11,7 @@ export interface KeyValueRow {
   key: string;
   value: string;
   enabled: boolean;
+  locked?: boolean;
 }
 
 export interface AuthConfig {
@@ -24,6 +26,9 @@ export interface BodyConfig {
   content: string;
 }
 
+export type ResponseTab = "body" | "headers";
+export type ResponseBodyMode = "raw" | "pretty";
+
 export interface RequestData {
   id: string;
   name: string;
@@ -34,6 +39,8 @@ export interface RequestData {
   auth: AuthConfig;
   body: BodyConfig;
   activeEditorTab: EditorTab;
+  activeResponseTab: ResponseTab;
+  responseBodyMode: ResponseBodyMode;
 }
 
 export interface OpenTab {
@@ -94,16 +101,25 @@ export const useRequestStore = create<RequestState>((set, get) => ({
   requests: {},
   createRequest: () => {
     const id = crypto.randomUUID();
+    const userAgentRow: KeyValueRow = {
+      id: crypto.randomUUID(),
+      key: "User-Agent",
+      value: `api-studio/${version}`,
+      enabled: true,
+      locked: true,
+    };
     const request: RequestData = {
       id,
       name: "Untitled",
       method: "GET",
       url: "",
-      headers: [],
+      headers: [userAgentRow],
       queryParams: [],
       auth: { type: "none", token: "", username: "", password: "" },
       body: { type: "none", content: "" },
       activeEditorTab: "params",
+      activeResponseTab: "body",
+      responseBodyMode: "pretty",
     };
     set((state) => ({
       requests: { ...state.requests, [id]: request },

@@ -13,7 +13,9 @@ function makeRequest(overrides: Partial<RequestData> = {}): RequestData {
     queryParams: [],
     auth: { type: "none", token: "", username: "", password: "" },
     body: { type: "none", content: "" },
-    activeEditorTab: "auth",
+    activeEditorTab: "auth" as const,
+    activeResponseTab: "body" as const,
+    responseBodyMode: "pretty" as const,
     ...overrides,
   };
 }

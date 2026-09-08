@@ -26,7 +26,13 @@ describe("useRequestStore", () => {
       expect(request.method).toBe("GET");
       expect(request.url).toBe("");
       expect(request.name).toBe("Untitled");
-      expect(request.headers).toEqual([]);
+      expect(request.headers).toHaveLength(1);
+      expect(request.headers[0]).toMatchObject({
+        key: "User-Agent",
+        value: expect.stringMatching(/^api-studio\//),
+        enabled: true,
+        locked: true,
+      });
       expect(request.queryParams).toEqual([]);
       expect(request.auth).toEqual({
         type: "none",
