@@ -8,6 +8,7 @@ import {
 } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { RequestPage } from "./RequestPage";
+import { version } from "../../../package.json";
 import { useRequestStore } from "./requestStore";
 import { useResponseStore } from "@/stores/responseStore";
 
@@ -477,7 +478,7 @@ describe("RequestPage", () => {
         {
           id: "ua",
           key: "User-Agent",
-          value: "api-studio/1.1.0",
+          value: `api-studio/${version}`,
           enabled: false,
           locked: true,
         },

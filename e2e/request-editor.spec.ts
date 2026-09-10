@@ -455,7 +455,7 @@ test.describe("User-Agent Header", () => {
     ).toHaveValue("User-Agent");
     await expect(
       page.getByRole("textbox", { name: "Value" }).first(),
-    ).toHaveValue("api-studio/1.1.0");
+    ).toHaveValue(`api-studio/${version}`);
   });
 
   test("User-Agent inputs are disabled", async ({ page }) => {

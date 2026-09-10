@@ -26,6 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      actions: read
 
     steps:
       - name: Checkout repository
@@ -36,6 +37,14 @@ jobs:
       - name: Get version from package.json
         id: version
         run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+
+      - name: Download macOS artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: macOS-artifacts
+          path: artifacts
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Configure Git
         run: |
@@ -56,17 +65,6 @@ jobs:
           generate_release_notes: true
           draft: false
           prerelease: false
-
-  deploy:
-    name: Deploy
-    needs: [release]
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
-
-      - name: Deploy to production
-        run: |
-          echo "Add your deployment steps here"
-          # Example: Deploy to server, update database, etc.
+          files: |
+            artifacts/**/*.dmg
+            artifacts/**/*.app
