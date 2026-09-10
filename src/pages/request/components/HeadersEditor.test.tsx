@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { HeadersEditor } from "./HeadersEditor";
 import type { RequestData } from "../requestStore";
+import { version } from "../../../../package.json";
 
 function makeRequest(overrides: Partial<RequestData> = {}): RequestData {
   return {
@@ -73,7 +74,7 @@ describe("HeadersEditor", () => {
         {
           id: "1",
           key: "User-Agent",
-          value: "api-studio/1.1.0",
+          value: `api-studio/${version}`,
           enabled: true,
           locked: true,
         },
@@ -81,7 +82,7 @@ describe("HeadersEditor", () => {
     });
     render(<HeadersEditor request={request} onUpdate={onUpdate} />);
     const keyInput = screen.getByDisplayValue("User-Agent");
-    const valueInput = screen.getByDisplayValue("api-studio/1.1.0");
+    const valueInput = screen.getByDisplayValue(`api-studio/${version}`);
     expect(keyInput).toBeDisabled();
     expect(valueInput).toBeDisabled();
   });
@@ -92,7 +93,7 @@ describe("HeadersEditor", () => {
         {
           id: "1",
           key: "User-Agent",
-          value: "api-studio/1.1.0",
+          value: `api-studio/${version}`,
           enabled: true,
           locked: true,
         },
@@ -108,7 +109,7 @@ describe("HeadersEditor", () => {
         {
           id: "1",
           key: "User-Agent",
-          value: "api-studio/1.1.0",
+          value: `api-studio/${version}`,
           enabled: true,
           locked: true,
         },
@@ -122,7 +123,7 @@ describe("HeadersEditor", () => {
         {
           id: "1",
           key: "User-Agent",
-          value: "api-studio/1.1.0",
+          value: `api-studio/${version}`,
           enabled: false,
           locked: true,
         },
@@ -136,7 +137,7 @@ describe("HeadersEditor", () => {
         {
           id: "1",
           key: "User-Agent",
-          value: "api-studio/1.1.0",
+          value: `api-studio/${version}`,
           enabled: true,
           locked: true,
         },

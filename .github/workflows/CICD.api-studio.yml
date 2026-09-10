@@ -118,6 +118,8 @@ jobs:
     name: Build (${{ matrix.platform }})
     needs: [typecheck, format, unit-tests, e2e-tests, rust-tests]
     runs-on: ${{ matrix.platform }}
+    permissions:
+      contents: write
     strategy:
       fail-fast: false
       matrix:
