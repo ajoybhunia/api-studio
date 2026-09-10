@@ -13,7 +13,9 @@ function makeRequest(overrides: Partial<RequestData> = {}): RequestData {
     queryParams: [],
     auth: { type: "none", token: "", username: "", password: "" },
     body: { type: "none", content: "" },
-    activeEditorTab: "headers",
+    activeEditorTab: "headers" as const,
+    activeResponseTab: "body" as const,
+    responseBodyMode: "pretty" as const,
     ...overrides,
   };
 }
@@ -63,5 +65,92 @@ describe("HeadersEditor", () => {
     render(<HeadersEditor request={request} onUpdate={onUpdate} />);
     fireEvent.click(screen.getByText("×"));
     expect(onUpdate).toHaveBeenCalledWith({ headers: [] });
+  });
+
+  it("renders locked row with disabled inputs", () => {
+    const request = makeRequest({
+      headers: [
+        {
+          id: "1",
+          key: "User-Agent",
+          value: "api-studio/1.1.0",
+          enabled: true,
+          locked: true,
+        },
+      ],
+    });
+    render(<HeadersEditor request={request} onUpdate={onUpdate} />);
+    const keyInput = screen.getByDisplayValue("User-Agent");
+    const valueInput = screen.getByDisplayValue("api-studio/1.1.0");
+    expect(keyInput).toBeDisabled();
+    expect(valueInput).toBeDisabled();
+  });
+
+  it("does not show delete button for locked row", () => {
+    const request = makeRequest({
+      headers: [
+        {
+          id: "1",
+          key: "User-Agent",
+          value: "api-studio/1.1.0",
+          enabled: true,
+          locked: true,
+        },
+      ],
+    });
+    render(<HeadersEditor request={request} onUpdate={onUpdate} />);
+    expect(screen.queryByText("×")).not.toBeInTheDocument();
+  });
+
+  it("allows toggling locked row enabled state", () => {
+    const request = makeRequest({
+      headers: [
+        {
+          id: "1",
+          key: "User-Agent",
+          value: "api-studio/1.1.0",
+          enabled: true,
+          locked: true,
+        },
+      ],
+    });
+    render(<HeadersEditor request={request} onUpdate={onUpdate} />);
+    const checkbox = screen.getByRole("checkbox");
+    fireEvent.click(checkbox);
+    expect(onUpdate).toHaveBeenCalledWith({
+      headers: [
+        {
+          id: "1",
+          key: "User-Agent",
+          value: "api-studio/1.1.0",
+          enabled: false,
+          locked: true,
+        },
+      ],
+    });
+  });
+
+  it("shows both locked and regular rows", () => {
+    const request = makeRequest({
+      headers: [
+        {
+          id: "1",
+          key: "User-Agent",
+          value: "api-studio/1.1.0",
+          enabled: true,
+          locked: true,
+        },
+        {
+          id: "2",
+          key: "X-Custom",
+          value: "test",
+          enabled: true,
+        },
+      ],
+    });
+    render(<HeadersEditor request={request} onUpdate={onUpdate} />);
+    expect(screen.getByDisplayValue("User-Agent")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("X-Custom")).toBeInTheDocument();
+    expect(screen.getAllByText("×")).toHaveLength(1);
   });
 });

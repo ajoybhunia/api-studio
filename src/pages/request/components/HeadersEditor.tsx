@@ -50,21 +50,25 @@ export function HeadersEditor({ request, onUpdate }: HeadersEditorProps) {
             onChange={(e) => updateRow(row.id, "key", e.target.value)}
             placeholder="Key"
             className="flex-1"
+            disabled={row.locked}
           />
           <Input
             value={row.value}
             onChange={(e) => updateRow(row.id, "value", e.target.value)}
             placeholder="Value"
             className="flex-1"
+            disabled={row.locked}
           />
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => removeRow(row.id)}
-            className="shrink-0 text-muted-foreground hover:text-foreground"
-          >
-            ×
-          </Button>
+          {!row.locked && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => removeRow(row.id)}
+              className="shrink-0 text-muted-foreground hover:text-foreground"
+            >
+              ×
+            </Button>
+          )}
         </div>
       ))}
       <Button variant="ghost" size="sm" onClick={addRow} className="self-start">

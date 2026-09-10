@@ -11,6 +11,8 @@ export interface SendResponse {
   headers: Record<string, string>;
   body: ResponseBody;
   time_ms: number;
+  ttfb_ms: number;
+  size_bytes: number;
 }
 
 export type ResponseBody =

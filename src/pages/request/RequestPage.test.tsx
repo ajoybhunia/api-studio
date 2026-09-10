@@ -1,5 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen, fireEvent, act } from "@testing-library/react";
+import {
+  render,
+  screen,
+  fireEvent,
+  act,
+  waitFor,
+} from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { RequestPage } from "./RequestPage";
 import { useRequestStore } from "./requestStore";
@@ -125,7 +131,7 @@ describe("RequestPage", () => {
     expect(sendRequestSpy).toHaveBeenCalledWith(id, {
       method: "GET",
       url: "https://api.example.com",
-      headers: undefined,
+      headers: { "User-Agent": expect.stringMatching(/^api-studio\//) },
       body: undefined,
     });
     sendRequestSpy.mockRestore();
@@ -150,7 +156,7 @@ describe("RequestPage", () => {
     expect(sendRequestSpy).toHaveBeenCalledWith(id, {
       method: "GET",
       url: "https://api.example.com/users?page=1&limit=10",
-      headers: undefined,
+      headers: { "User-Agent": expect.stringMatching(/^api-studio\//) },
       body: undefined,
     });
     sendRequestSpy.mockRestore();
@@ -175,7 +181,10 @@ describe("RequestPage", () => {
     expect(sendRequestSpy).toHaveBeenCalledWith(id, {
       method: "GET",
       url: "https://api.example.com",
-      headers: { "X-Custom": "test" },
+      headers: {
+        "X-Custom": "test",
+        "User-Agent": expect.stringMatching(/^api-studio\//),
+      },
       body: undefined,
     });
     sendRequestSpy.mockRestore();
@@ -197,7 +206,10 @@ describe("RequestPage", () => {
     expect(sendRequestSpy).toHaveBeenCalledWith(id, {
       method: "GET",
       url: "https://api.example.com",
-      headers: { Authorization: "Bearer abc123" },
+      headers: {
+        Authorization: "Bearer abc123",
+        "User-Agent": expect.stringMatching(/^api-studio\//),
+      },
       body: undefined,
     });
     sendRequestSpy.mockRestore();
@@ -317,7 +329,10 @@ describe("RequestPage", () => {
     expect(sendRequestSpy).toHaveBeenCalledWith(id, {
       method: "GET",
       url: "https://api.example.com",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "User-Agent": expect.stringMatching(/^api-studio\//),
+      },
       body: '{"key":"value"}',
     });
     sendRequestSpy.mockRestore();
@@ -339,7 +354,10 @@ describe("RequestPage", () => {
     expect(sendRequestSpy).toHaveBeenCalledWith(id, {
       method: "GET",
       url: "https://api.example.com",
-      headers: { "Content-Type": "text/plain" },
+      headers: {
+        "Content-Type": "text/plain",
+        "User-Agent": expect.stringMatching(/^api-studio\//),
+      },
       body: "hello world",
     });
     sendRequestSpy.mockRestore();
@@ -364,8 +382,117 @@ describe("RequestPage", () => {
     expect(sendRequestSpy).toHaveBeenCalledWith(id, {
       method: "GET",
       url: "https://api.example.com",
-      headers: { "Content-Type": "text/html" },
+      headers: {
+        "Content-Type": "text/html",
+        "User-Agent": expect.stringMatching(/^api-studio\//),
+      },
       body: "hello world",
+    });
+    sendRequestSpy.mockRestore();
+  });
+
+  it("syncs URL query params to params rows", async () => {
+    const id = useRequestStore.getState().createRequest();
+    useRequestStore
+      .getState()
+      .updateRequest(id, { url: "https://api.example.com?page=1&limit=10" });
+    renderWithRouter(<RequestPage />, `/request/${id}`);
+
+    await waitFor(() => {
+      const state = useRequestStore.getState().requests[id];
+      expect(state.url).toBe("https://api.example.com");
+      expect(state.queryParams).toHaveLength(2);
+      expect(state.queryParams[0].key).toBe("page");
+      expect(state.queryParams[0].value).toBe("1");
+      expect(state.queryParams[1].key).toBe("limit");
+      expect(state.queryParams[1].value).toBe("10");
+    });
+  });
+
+  it("merges URL params with existing params rows", async () => {
+    const id = useRequestStore.getState().createRequest();
+    useRequestStore.getState().updateRequest(id, {
+      url: "https://api.example.com?sort=name",
+      queryParams: [{ id: "p1", key: "page", value: "1", enabled: true }],
+    });
+    renderWithRouter(<RequestPage />, `/request/${id}`);
+
+    await waitFor(() => {
+      const state = useRequestStore.getState().requests[id];
+      expect(state.url).toBe("https://api.example.com");
+      expect(state.queryParams).toHaveLength(2);
+      expect(state.queryParams.some((p) => p.key === "page")).toBe(true);
+      expect(state.queryParams.some((p) => p.key === "sort")).toBe(true);
+    });
+  });
+
+  it("keeps duplicate params from URL", async () => {
+    const id = useRequestStore.getState().createRequest();
+    useRequestStore
+      .getState()
+      .updateRequest(id, { url: "https://api.example.com?tag=a&tag=b" });
+    renderWithRouter(<RequestPage />, `/request/${id}`);
+
+    await waitFor(() => {
+      const state = useRequestStore.getState().requests[id];
+      expect(state.queryParams).toHaveLength(2);
+      expect(state.queryParams[0].key).toBe("tag");
+      expect(state.queryParams[0].value).toBe("a");
+      expect(state.queryParams[1].key).toBe("tag");
+      expect(state.queryParams[1].value).toBe("b");
+    });
+  });
+
+  it("decodes URL-encoded values in params rows", async () => {
+    const id = useRequestStore.getState().createRequest();
+    useRequestStore
+      .getState()
+      .updateRequest(id, { url: "https://api.example.com?q=hello%20world" });
+    renderWithRouter(<RequestPage />, `/request/${id}`);
+
+    await waitFor(() => {
+      const state = useRequestStore.getState().requests[id];
+      expect(state.queryParams[0].value).toBe("hello world");
+    });
+  });
+
+  it("does not sync when URL has no query string", () => {
+    const id = useRequestStore.getState().createRequest();
+    useRequestStore
+      .getState()
+      .updateRequest(id, { url: "https://api.example.com" });
+    renderWithRouter(<RequestPage />, `/request/${id}`);
+
+    const state = useRequestStore.getState().requests[id];
+    expect(state.queryParams).toHaveLength(0);
+  });
+
+  it("does not send User-Agent when disabled", () => {
+    const id = useRequestStore.getState().createRequest();
+    useRequestStore
+      .getState()
+      .updateRequest(id, { url: "https://api.example.com" });
+    useRequestStore.getState().updateRequest(id, {
+      headers: [
+        {
+          id: "ua",
+          key: "User-Agent",
+          value: "api-studio/1.1.0",
+          enabled: false,
+          locked: true,
+        },
+      ],
+    });
+    const sendRequestSpy = vi
+      .spyOn(useResponseStore.getState(), "sendRequest")
+      .mockImplementation(() => Promise.resolve());
+    renderWithRouter(<RequestPage />, `/request/${id}`);
+    fireEvent.keyDown(window, { key: "Enter", ctrlKey: true });
+    expect(sendRequestSpy).toHaveBeenCalledWith(id, {
+      method: "GET",
+      url: "https://api.example.com",
+      headers: undefined,
+      body: undefined,
     });
     sendRequestSpy.mockRestore();
   });

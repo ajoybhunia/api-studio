@@ -1,18 +1,53 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/Button";
 import { useRequestStore } from "./requestStore";
-import type { RequestData } from "./requestStore";
+import type { RequestData, KeyValueRow } from "./requestStore";
 import { useResponseStore } from "@/stores/responseStore";
 import { RequestBar } from "./components/RequestBar";
 import { RequestEditor } from "./components/RequestEditor";
 import { ResponsePanel } from "./components/ResponsePanel";
+import { version } from "../../../package.json";
 
 function buildQueryString(queryParams: RequestData["queryParams"]): string {
   return queryParams
     .filter((p) => p.enabled && p.key.trim())
     .map((p) => `${encodeURIComponent(p.key)}=${encodeURIComponent(p.value)}`)
     .join("&");
+}
+
+function parseQueryString(url: string): KeyValueRow[] {
+  try {
+    const parsed = new URL(url);
+    const params: KeyValueRow[] = [];
+    parsed.searchParams.forEach((value, key) => {
+      params.push({
+        id: crypto.randomUUID(),
+        key,
+        value: decodeURIComponent(value),
+        enabled: true,
+      });
+    });
+    return params;
+  } catch {
+    return [];
+  }
+}
+
+function getBaseUrl(url: string): string {
+  try {
+    const parsed = new URL(url);
+    const base = parsed.origin + parsed.pathname;
+    if (base.endsWith("/") && parsed.pathname !== "/") {
+      return base.slice(0, -1);
+    }
+    if (parsed.pathname === "/" && parsed.search) {
+      return parsed.origin;
+    }
+    return base;
+  } catch {
+    return url.split("?")[0] || url;
+  }
 }
 
 function PreviewUrl({ request }: { request: RequestData }) {
@@ -41,6 +76,42 @@ export function RequestPage() {
   const responseRecord = useResponseStore((s) =>
     id ? s.responses[id] : undefined,
   );
+
+  const lastSyncedUrl = useRef<string>("");
+
+  useEffect(() => {
+    if (!request || !id) return;
+
+    const url = request.url;
+    const hasQueryString = url.includes("?");
+
+    if (!hasQueryString) return;
+
+    const baseUrl = getBaseUrl(url);
+    const parsedParams = parseQueryString(url);
+
+    if (parsedParams.length === 0) {
+      if (url !== baseUrl) {
+        updateRequest(id, { url: baseUrl });
+      }
+      return;
+    }
+
+    const syncKey = `${baseUrl}|${JSON.stringify(parsedParams)}`;
+    if (syncKey === lastSyncedUrl.current) return;
+
+    lastSyncedUrl.current = syncKey;
+
+    const existingParams = request.queryParams;
+    const merged: KeyValueRow[] = [
+      ...existingParams.filter(
+        (ep) => !parsedParams.some((pp) => pp.key === ep.key),
+      ),
+      ...parsedParams,
+    ];
+
+    updateRequest(id, { url: baseUrl, queryParams: merged });
+  }, [request?.url, request?.queryParams, id, updateRequest]);
 
   const isJsonBodyInvalid = useMemo(() => {
     if (!request || request.body.type !== "json") return false;
@@ -81,6 +152,13 @@ export function RequestPage() {
       headers["Content-Type"] = "application/json";
     } else if (request.body.type === "raw" && !headers["Content-Type"]) {
       headers["Content-Type"] = "text/plain";
+    }
+
+    if (!headers["User-Agent"]) {
+      const userAgentRow = request.headers.find((h) => h.key === "User-Agent");
+      if (!userAgentRow || userAgentRow.enabled) {
+        headers["User-Agent"] = `api-studio/${version}`;
+      }
     }
 
     const body =
@@ -129,7 +207,18 @@ export function RequestPage() {
         />
       </div>
       <div className="flex-1 overflow-auto">
-        <ResponsePanel record={responseRecord} className="h-full" />
+        <ResponsePanel
+          record={responseRecord}
+          activeResponseTab={request.activeResponseTab}
+          responseBodyMode={request.responseBodyMode}
+          onActiveResponseTabChange={(tab) =>
+            updateRequest(id, { activeResponseTab: tab })
+          }
+          onResponseBodyModeChange={(mode) =>
+            updateRequest(id, { responseBodyMode: mode })
+          }
+          className="h-full"
+        />
       </div>
     </div>
   );

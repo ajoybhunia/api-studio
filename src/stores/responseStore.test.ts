@@ -38,6 +38,8 @@ describe("useResponseStore", () => {
       headers: {},
       body: { type: "Text" as const, value: "ok" },
       time_ms: 42,
+      ttfb_ms: 10,
+      size_bytes: 2,
     };
     mockInvoke.mockResolvedValue(mockResponse);
     await useResponseStore.getState().sendRequest("req1", {
@@ -69,6 +71,8 @@ describe("useResponseStore", () => {
       headers: {},
       body: { type: "Empty" as const },
       time_ms: 10,
+      ttfb_ms: 5,
+      size_bytes: 0,
     });
     await useResponseStore.getState().sendRequest("req1", {
       method: "GET",
@@ -87,6 +91,8 @@ describe("useResponseStore", () => {
       headers: {},
       body: { type: "Empty" as const },
       time_ms: 10,
+      ttfb_ms: 5,
+      size_bytes: 0,
     });
     await useResponseStore.getState().sendRequest("req1", {
       method: "GET",
@@ -104,6 +110,8 @@ describe("useResponseStore", () => {
       headers: {},
       body: { type: "Empty" as const },
       time_ms: 10,
+      ttfb_ms: 5,
+      size_bytes: 0,
     });
     await useResponseStore.getState().sendRequest("req1", {
       method: "GET",
